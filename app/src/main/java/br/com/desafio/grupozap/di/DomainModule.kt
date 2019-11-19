@@ -13,7 +13,6 @@ object DomainModule {
     @Singleton
     @JvmStatic
     fun providesRealStateUseCases(realStateUseCasesImpl: RealStateUseCasesImpl): RealStateUseCases {
-        realStateUseCasesImpl.refreshCachedLegalStates()
         return realStateUseCasesImpl
     }
 }
