@@ -2,7 +2,6 @@ package br.com.desafio.grupozap.data
 
 import android.content.Context
 import android.net.ConnectivityManager
-import br.com.desafio.grupozap.data.entities.FilterType
 import br.com.desafio.grupozap.data.entities.RealState
 import br.com.desafio.grupozap.data.network.CacheInterceptor
 import br.com.desafio.grupozap.data.network.GrupoZapService

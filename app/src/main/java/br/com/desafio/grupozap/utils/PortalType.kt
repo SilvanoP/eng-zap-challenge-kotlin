@@ -1,4 +1,4 @@
-package br.com.desafio.grupozap.data.entities
+package br.com.desafio.grupozap.utils
 
 enum class PortalType {
     ALL, VIVA_REAL, ZAP

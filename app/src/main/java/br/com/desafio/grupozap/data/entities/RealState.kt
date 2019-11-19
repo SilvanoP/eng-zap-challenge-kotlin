@@ -1,6 +1,7 @@
 package br.com.desafio.grupozap.data.entities
 
 import android.os.Parcelable
+import br.com.desafio.grupozap.utils.PortalType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -17,9 +18,7 @@ data class RealState(
     val address : Address,
     val bathrooms : Int,
     val bedrooms : Int,
-    val pricingInfos : PricingInfos
-): Parcelable {
-
+    val pricingInfos : PricingInfos,
     @Transient
-    var portal: PortalType = PortalType.ZAP
-}
+    var portal: PortalType = PortalType.ALL
+): Parcelable

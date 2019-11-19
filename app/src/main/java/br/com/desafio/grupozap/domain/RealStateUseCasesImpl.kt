@@ -1,8 +1,8 @@
 package br.com.desafio.grupozap.domain
 
-import br.com.desafio.grupozap.data.entities.BusinessType
-import br.com.desafio.grupozap.data.entities.FilterType
-import br.com.desafio.grupozap.data.entities.PortalType
+import br.com.desafio.grupozap.utils.BusinessType
+import br.com.desafio.grupozap.utils.FilterType
+import br.com.desafio.grupozap.utils.PortalType
 import br.com.desafio.grupozap.data.entities.RealState
 import br.com.desafio.grupozap.utils.Constants
 import br.com.desafio.grupozap.utils.Utils
