@@ -9,5 +9,5 @@ class PricingInfos (
     val price : Int,
     val rentalTotalPrice : Int,
     val businessType : String,
-    val monthlyCondoFee : Int
+    val monthlyCondoFee : String?
 ): Parcelable
