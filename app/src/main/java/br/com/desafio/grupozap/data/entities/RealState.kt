@@ -18,4 +18,8 @@ data class RealState(
     val bathrooms : Int,
     val bedrooms : Int,
     val pricingInfos : PricingInfos
-): Parcelable
+): Parcelable {
+
+    @Transient
+    var portal: PortalType = PortalType.ZAP
+}

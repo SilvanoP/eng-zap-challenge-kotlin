@@ -1,8 +1,10 @@
 package br.com.desafio.grupozap.di
 
 import android.content.Context
+import br.com.desafio.grupozap.data.DataRepositoryImpl
 import br.com.desafio.grupozap.data.network.CacheInterceptor
 import br.com.desafio.grupozap.data.network.GrupoZapService
+import br.com.desafio.grupozap.domain.DataRepository
 import br.com.desafio.grupozap.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -46,5 +48,12 @@ object DataModule {
             .client(client)
             .build()
             .create(GrupoZapService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @JvmStatic
+    fun providesDataRepository(dataRepositoryImpl: DataRepositoryImpl): DataRepository {
+        return dataRepositoryImpl
     }
 }

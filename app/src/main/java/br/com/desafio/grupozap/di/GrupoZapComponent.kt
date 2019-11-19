@@ -8,9 +8,12 @@ import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(DataModule::class,
+@Component(modules = arrayOf(
     ContextModule::class,
-    AndroidSupportInjectionModule::class))
+    DataModule::class,
+    DomainModule::class,
+    AndroidSupportInjectionModule::class
+))
 interface GrupoZapComponent: AndroidInjector<GrupoZapApplication> {
 
     @Component.Builder
