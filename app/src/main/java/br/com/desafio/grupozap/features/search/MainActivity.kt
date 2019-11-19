@@ -1,4 +1,4 @@
-package br.com.desafio.grupozap.features.list
+package br.com.desafio.grupozap.features.search
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

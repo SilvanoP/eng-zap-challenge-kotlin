@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">GrupoZap</string>
+    <string name="app_name">Grupo Zap</string>
+
+    <string name="buy">Buy</string>
+    <string name="city_neighborhood">Type City or Neighborhood</string>
+    <string name="rent">Rent</string>
+    <string name="search">Search</string>
+
+    <string name="tools_city">City X</string>
 </resources>
