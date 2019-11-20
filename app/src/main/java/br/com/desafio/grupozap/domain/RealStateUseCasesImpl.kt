@@ -22,7 +22,7 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
     private val cachedFilteredStates: MutableList<RealState> = ArrayList()
     private var lastLegalStatesIndex = 0
 
-    override suspend fun refreshCachedLegalStates() {
+    override suspend fun refreshCachedLegalStates(): Boolean {
         repository.getAllRealStates().forEach {
             // verify if each real state is eligible for Zap or Viva Real or none
             val lat = it.address.geoLocation.location.lat
@@ -70,6 +70,11 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
                 }
             }
         }
+
+        if(cachedLegalStates.size > 0)
+            return true
+
+        return false
     }
 
     private fun isOnBoundingBox(lat: Double, lon: Double): Boolean =
@@ -83,13 +88,16 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
     override suspend fun getByFilter(filterMap: Map<Int, String>, page: Int): List<RealState> {
         val startIndex = page * PAGE_SIZE
-        val endIndex = startIndex + PAGE_SIZE
+        var endIndex = startIndex + PAGE_SIZE
+        if (endIndex > cachedLegalStates.size) {
+           endIndex = cachedLegalStates.size
+        }
 
         if (filterMap.isEmpty()) {
             cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex))
         } else {
-            if (cachedFilteredStates.size < endIndex+1 && lastLegalStatesIndex < cachedLegalStates.size-1) {
-                val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size-1)
+            if (cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
+                val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
                 auxList.forEachIndexed { index, state ->
                     var matchFilter = true
 
@@ -139,63 +147,4 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
         return cachedFilteredStates
     }
-
-    /* TODO remove if not needed
-    override suspend fun getByFilter(filterMap: Map<Int, String>): List<RealState> {
-        if (filterMap.isEmpty()) {
-            return cachedLegalStates
-        }
-
-        if (cachedFilteredStates.isEmpty()) {
-            cachedFilteredStates.addAll(cachedLegalStates)
-
-            filterMap.keys.forEach {
-                val statesToRemove = ArrayList<RealState>()
-
-                when (it) {
-                    FilterType.LOCATION.filterValue ->
-                        cachedFilteredStates.forEach { state ->
-                            if ((state.address.city.isEmpty() || !state.address.city.equals(
-                                    filterMap[it]
-                                ))
-                                && (state.address.neighborhood.isEmpty() || state.address.neighborhood.equals(
-                                    filterMap[it]
-                                ))
-                            ) {
-                                statesToRemove.add(state)
-                            }
-                        }
-                    FilterType.TYPE.filterValue ->
-                        cachedFilteredStates.forEach { state ->
-                            if (state.pricingInfos.businessType.equals(filterMap[it])) {
-                                statesToRemove.add(state)
-                            }
-                        }
-                    FilterType.PORTAL.filterValue ->
-                        cachedFilteredStates.forEach { state ->
-                            if (state.portal.toString() != filterMap[it] && state.portal != PortalType.ALL) {
-                                statesToRemove.add(state)
-                            }
-                        }
-                    FilterType.PRICE.filterValue ->
-                        cachedFilteredStates.forEach { state ->
-                            if (state.pricingInfos.price > filterMap[it]?.toInt()?: 0) {
-                                statesToRemove.add(state)
-                            }
-                        }
-                    FilterType.BEDROOMS.filterValue ->
-                        cachedFilteredStates.forEach { state ->
-                            val bedroom = filterMap[it]?.toInt()?:0
-                            if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
-                                statesToRemove.add(state)
-                            }
-                        }
-                }
-
-                cachedFilteredStates.removeAll(statesToRemove)
-            }
-        }
-
-        return cachedFilteredStates
-    }*/
 }
