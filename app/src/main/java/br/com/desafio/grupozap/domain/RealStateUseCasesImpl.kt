@@ -11,15 +11,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val PAGE_SIZE = 20
+
 @Singleton
 class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases {
 
-    companion object {
-        const val PAGE_SIZE = 20
-    }
-
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
     private val cachedFilteredStates: MutableList<RealState> = ArrayList()
+    private var filterMap: Map<Int, String> = HashMap()
     private var lastLegalStatesIndex = 0
 
     override suspend fun refreshCachedLegalStates(): Boolean {
@@ -86,60 +85,68 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
     override fun clearFilter() {cachedFilteredStates.clear()}
 
-    override suspend fun getByFilter(filterMap: Map<Int, String>, page: Int): List<RealState> {
+    override suspend fun getByFilter(filterMap: Map<Int, String>): List<RealState> {
+        this.filterMap = filterMap
+
+        return getNextPage(0)
+    }
+
+    override suspend fun getNextPage(page: Int): List<RealState> {
         val startIndex = page * PAGE_SIZE
         var endIndex = startIndex + PAGE_SIZE
         if (endIndex > cachedLegalStates.size) {
-           endIndex = cachedLegalStates.size
+            endIndex = cachedLegalStates.size
+        }
+
+        if (cachedFilteredStates.size == endIndex) {
+            return cachedFilteredStates
         }
 
         if (filterMap.isEmpty()) {
             cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex))
         } else {
-            if (cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
-                val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
-                auxList.forEachIndexed { index, state ->
-                    var matchFilter = true
+            val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
+            auxList.forEachIndexed { index, state ->
+                var matchFilter = true
 
-                    filterMap.keys.forEach { key ->
-                        when(key) {
-                            FilterType.LOCATION.filterValue ->
-                                if (state.address.city != filterMap[key]
-                                    && state.address.neighborhood != filterMap[key]) {
-                                    matchFilter = false
-                                    return@forEach
-                                }
-                            FilterType.TYPE.filterValue ->
-                                if (state.pricingInfos.businessType != filterMap[key]) {
-                                    matchFilter = false
-                                    return@forEach
-                                }
-                            FilterType.PORTAL.filterValue ->
-                                    if (state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
-                                        matchFilter = false
-                                        return@forEach
-                                    }
-                            FilterType.PRICE.filterValue ->
-                                    if (state.pricingInfos.price > filterMap[key]?.toInt()?: 0) {
-                                        matchFilter = false
-                                        return@forEach
-                                    }
-                            FilterType.BEDROOMS.filterValue -> {
-                                    val bedroom = filterMap[key]?.toInt()?:0
-                                    if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
-                                        matchFilter = false
-                                        return@forEach
-                                    }
-                                }
+                filterMap.keys.forEach { key ->
+                    when(key) {
+                        FilterType.LOCATION.filterValue ->
+                            if (state.address.city != filterMap[key]
+                                && state.address.neighborhood != filterMap[key]) {
+                                matchFilter = false
+                                return@forEach
+                            }
+                        FilterType.TYPE.filterValue ->
+                            if (state.pricingInfos.businessType != filterMap[key]) {
+                                matchFilter = false
+                                return@forEach
+                            }
+                        FilterType.PORTAL.filterValue ->
+                            if (state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
+                                matchFilter = false
+                                return@forEach
+                            }
+                        FilterType.PRICE.filterValue ->
+                            if (state.pricingInfos.price > filterMap[key]?.toInt()?: 0) {
+                                matchFilter = false
+                                return@forEach
+                            }
+                        FilterType.BEDROOMS.filterValue -> {
+                            val bedroom = filterMap[key]?.toInt()?:0
+                            if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
+                                matchFilter = false
+                                return@forEach
+                            }
                         }
                     }
+                }
 
-                    if (matchFilter) {
-                        cachedFilteredStates.add(state)
-                        if (cachedFilteredStates.size > endIndex+1) {
-                            lastLegalStatesIndex += index
-                            return@forEachIndexed
-                        }
+                if (matchFilter) {
+                    cachedFilteredStates.add(state)
+                    if (cachedFilteredStates.size > endIndex+1) {
+                        lastLegalStatesIndex += index
+                        return@forEachIndexed
                     }
                 }
             }
