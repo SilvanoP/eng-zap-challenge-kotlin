@@ -113,7 +113,7 @@ class RealStateUseCasesImplTest {
 
                 val filterMap: MutableMap<Int, String> = HashMap()
                 filterMap[FilterType.BEDROOMS.filterValue] = state1.bedrooms.toString()
-                
+
                 val resultOriginalSize = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0).size
 
                 filterMap.clear()
