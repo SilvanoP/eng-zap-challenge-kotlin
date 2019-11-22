@@ -18,17 +18,20 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.random.Random
 
 @RunWith(MockitoJUnitRunner::class)
-class RealStateUseCasesImplTest {
+class UseCasesImplTest {
 
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
     @Mock
     private lateinit var mockRepository: DataRepository
     @InjectMocks
-    private lateinit var mockRealStateUseCasesImpl: RealStateUseCasesImpl
+    private lateinit var mockUseCasesImpl: UseCasesImpl
 
     @Before
     fun setUp() {
@@ -50,80 +53,14 @@ class RealStateUseCasesImplTest {
                 data.add(state)
                 Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
 
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
+                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
 
                 assertTrue("CachedLegalRealStates Error", resultOk)
 
-                val resultList = mockRealStateUseCasesImpl.getByFilter(HashMap(),0)
+                val resultList = mockUseCasesImpl.getByFilter(EnumMap(FilterType::class.java))
 
                 assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 1)
                 assertTrue("Wrong state id: %s".format(resultList[0].id), resultList[0].id == state.id)
-            }
-        }
-    }
-
-    @Test
-    fun clearFilterNoClearTest() {
-        runBlocking {
-            launch(Dispatchers.Main) {
-                val state1 = createRandomData()
-                val state2 = createRandomData()
-                val state3 = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state1)
-                data.add(state2)
-                data.add(state3)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
-
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
-
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val filterMap: MutableMap<Int, String> = HashMap()
-                filterMap[FilterType.BEDROOMS.filterValue] = state1.bedrooms.toString()
-
-                val resultListOriginal = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0)
-
-                filterMap.clear()
-                filterMap[FilterType.LOCATION.filterValue] = "City"
-
-                val resultList = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0)
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == resultListOriginal.size)
-            }
-        }
-    }
-
-    @Test
-    fun clearFilterWithClearTest() {
-        runBlocking {
-            launch(Dispatchers.Main) {
-                val state1 = createRandomData()
-                val state2 = createRandomData()
-                val state3 = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state1)
-                data.add(state2)
-                data.add(state3)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
-
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
-
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val filterMap: MutableMap<Int, String> = HashMap()
-                filterMap[FilterType.BEDROOMS.filterValue] = state1.bedrooms.toString()
-
-                val resultOriginalSize = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0).size
-
-                filterMap.clear()
-                filterMap[FilterType.LOCATION.filterValue] = "City"
-                mockRealStateUseCasesImpl.clearFilter()
-
-                val resultList = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0)
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 3)
-                assertTrue("Results sizes were equal", resultList.size != resultOriginalSize)
             }
         }
     }
@@ -139,11 +76,11 @@ class RealStateUseCasesImplTest {
                 data.add(state2)
                 Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
 
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
+                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
 
                 assertTrue("CachedLegalRealStates Error", resultOk)
 
-                val resultList = mockRealStateUseCasesImpl.getByFilter(HashMap(),0)
+                val resultList = mockUseCasesImpl.getByFilter(EnumMap(FilterType::class.java))
 
                 assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 1)
                 assertTrue("Wrong state id: %s".format(resultList[0].id), resultList[0].id == state1.id)
@@ -162,14 +99,14 @@ class RealStateUseCasesImplTest {
                 data.add(state2)
                 Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
 
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
+                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
 
                 assertTrue("CachedLegalRealStates Error", resultOk)
 
-                val filterMap: MutableMap<Int, String> = HashMap()
-                filterMap[FilterType.LOCATION.filterValue] = "City"
+                val filterMap: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
+                filterMap[FilterType.LOCATION] = "City"
 
-                val resultList = mockRealStateUseCasesImpl.getByFilter(filterMap.toMap(),0)
+                val resultList = mockUseCasesImpl.getByFilter(filterMap.toMap())
 
                 assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 2)
             }
@@ -187,14 +124,14 @@ class RealStateUseCasesImplTest {
                 data.add(state2)
                 Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
 
-                val resultOk = mockRealStateUseCasesImpl.refreshCachedLegalStates()
+                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
 
                 assertTrue("CachedLegalRealStates Error", resultOk)
 
-                val filterMap: MutableMap<Int, String> = HashMap()
-                filterMap[FilterType.BEDROOMS.filterValue] = state1.bedrooms.toString()
+                val filterMap: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
+                filterMap[FilterType.BEDROOMS] = state1.bedrooms.toString()
 
-                val resultList = mockRealStateUseCasesImpl.getByFilter(HashMap(),0)
+                val resultList = mockUseCasesImpl.getByFilter(filterMap)
 
                 var resultSize = 1
                 if (state1.bedrooms == state2.bedrooms) {

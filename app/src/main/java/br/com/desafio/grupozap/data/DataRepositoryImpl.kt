@@ -8,7 +8,6 @@ import br.com.desafio.grupozap.data.network.CacheInterceptor
 import br.com.desafio.grupozap.data.network.GrupoZapService
 import br.com.desafio.grupozap.domain.DataRepository
 import br.com.desafio.grupozap.utils.FilterType
-import br.com.desafio.grupozap.utils.PortalType
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,21 +29,11 @@ class DataRepositoryImpl @Inject constructor(private val context: Context, priva
         return service.getRealStates().realStates
     }
 
-    override suspend fun getFilters(): Map<FilterType, String> {
-        val filterMap: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
-        FilterType.values().forEach {
-            filterMap[it] = preferences.getString(it.toString(),"")!!
-        }
-
-        return filterMap.toMap()
+    override suspend fun getFilter(filter: String): String? {
+        return preferences.getString(filter, "")
     }
 
-    override suspend fun saveFilters(filterMap: Map<FilterType, String>) {
-        with(preferences.edit()) {
-            filterMap.keys.forEach { key ->
-                putString(key.toString(), filterMap[key])
-            }
-            commit()
-        }
+    override suspend fun saveFilter(filter: String, value: String): Boolean {
+        return preferences.edit().putString(filter, value).commit()
     }
 }

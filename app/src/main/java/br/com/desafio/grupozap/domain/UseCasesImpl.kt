@@ -16,11 +16,11 @@ import kotlin.collections.ArrayList
 private const val PAGE_SIZE = 20
 
 @Singleton
-class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases {
+class UseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases, FiltersUseCase {
 
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
     private val cachedFilteredStates: MutableList<RealState> = ArrayList()
-    private var filterMap: Map<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
+    private var filterMap: MutableMap<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
     private var lastLegalStatesIndex = 0
 
     override suspend fun refreshCachedLegalStates(): Boolean {
@@ -78,6 +78,23 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
         return false
     }
 
+    override suspend fun getFilters(): Map<FilterType, String> {
+        FilterType.values().forEach {filter ->
+            val value: String? = repository.getFilter(filter.toString())
+            if(value?.isNotEmpty() != false) {
+                filterMap[filter] = value!!
+            }
+        }
+
+        return filterMap
+    }
+
+    override suspend fun saveFilters(filterMap: Map<FilterType, String>) {
+        filterMap.keys.forEach {filter ->
+            repository.saveFilter(filter.toString(), filterMap.getValue(filter))
+        }
+    }
+
     private fun isOnBoundingBox(lat: Double, lon: Double): Boolean =
         lat <= Constants.GRUPO_ZAP_BOUNDING_BOX_MAX_LAT
                 && lat >= Constants.GRUPO_ZAP_BOUNDING_BOX_MIN_LAT
@@ -85,7 +102,7 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
                 && lon >= Constants.GRUPO_ZAP_BOUNDING_BOX_MIN_LON
 
     override suspend fun getByFilter(filterMap: Map<FilterType, String>): List<RealState> {
-        this.filterMap = filterMap
+        this.filterMap = filterMap.toMutableMap()
 
         return getNextPage(0)
     }
