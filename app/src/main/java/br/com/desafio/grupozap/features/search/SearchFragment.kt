@@ -21,13 +21,12 @@ import br.com.desafio.grupozap.features.common.NavigationListener
  */
 class SearchFragment : Fragment() {
 
+    lateinit var viewModel: SearchViewModel
     private var listener: NavigationListener? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View? {
+
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
@@ -52,8 +51,11 @@ class SearchFragment : Fragment() {
          *
          * @return A new instance of fragment SearchFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() = SearchFragment()
+        fun newInstance(searchViewModel: SearchViewModel): SearchFragment {
+            val fragment = SearchFragment()
+            fragment.viewModel = searchViewModel
+            return fragment
+        }
     }
 }

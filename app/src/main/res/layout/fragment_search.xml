@@ -1,85 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".features.search.SearchFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/searchCityNeighborhoodInputLayout"
+    <data>
+        <import type="java.util.Map"/>
+        <import type="br.com.desafio.grupozap.utils.FilterType"/>
+        <variable name="viewModel" type="br.com.desafio.grupozap.features.search.SearchViewModel"/>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_default"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/searchBuyToogleButton"
-        >
+        android:layout_height="match_parent"
+        tools:context=".features.search.SearchFragment">
 
-        <AutoCompleteTextView
-            android:id="@+id/searchCityNeighborhoodAutoComplete"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/searchCityNeighborhoodInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/city_neighborhood"
-            tools:text="@string/tools_city"
+            android:layout_margin="@dimen/margin_default"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/searchBuyToggleButton"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/searchCityNeighborhoodAutoComplete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/city_neighborhood"
+                android:text="@{viewModel.filterMap[FilterType.LOCATION] ?? viewModel.filterMap[FilterType.LOCATION]}"
+                tools:text="@string/tools_city"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/searchBuyToggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:textOn="@string/buy"
+            android:textOff="@string/buy"
+            android:textAllCaps="true"
+            android:checked="@{viewModel.filterMap[FilterType.TYPE] == SALE ? true : false}"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toBottomOf="@id/searchCityNeighborhoodInputLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/searchRentToggleButton"
+            app:layout_constraintBottom_toTopOf="@+id/searchPortalLabelText"
             />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/searchRentToggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:textOn="@string/rent"
+            android:textOff="@string/rent"
+            android:textAllCaps="true"
+            android:checked="@{viewModel.filterMap[FilterType.TYPE] == SALE ? false : true}"
+            app:layout_constraintTop_toTopOf="@id/searchBuyToggleButton"
+            app:layout_constraintStart_toEndOf="@id/searchBuyToggleButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/searchBuyToggleButton"
+            />
 
-    <androidx.appcompat.widget.AppCompatToggleButton
-        android:id="@+id/searchBuyToogleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_default"
-        android:textOn="@string/buy"
-        android:textOff="@string/buy"
-        android:textAllCaps="true"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/searchCityNeighborhoodInputLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/searchRentToogleButton"
-        app:layout_constraintBottom_toTopOf="@+id/searchPortalSpinner"
-        />
+        <TextView
+            android:id="@+id/searchPortalLabelText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_default"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/portal_radios"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/searchPortalDividerView"
+            app:layout_constraintStart_toStartOf="@+id/searchPortalDividerView"
+            app:layout_constraintTop_toBottomOf="@+id/searchBuyToggleButton" />
 
-    <androidx.appcompat.widget.AppCompatToggleButton
-        android:id="@+id/searchRentToogleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_default"
-        android:textOn="@string/rent"
-        android:textOff="@string/rent"
-        android:textAllCaps="true"
-        app:layout_constraintTop_toTopOf="@id/searchBuyToogleButton"
-        app:layout_constraintStart_toEndOf="@id/searchBuyToogleButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/searchBuyToogleButton"
-        />
+        <view
+            android:id="@+id/searchPortalDividerView"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintBottom_toTopOf="@+id/searchPortalRadioGroup"
+            app:layout_constraintStart_toStartOf="@+id/searchPortalRadioGroup"
+            app:layout_constraintEnd_toEndOf="@+id/searchPortalRadioGroup"
+            app:layout_constraintTop_toBottomOf="@+id/searchPortalLabelText"/>
 
-    <androidx.appcompat.widget.AppCompatSpinner
-        android:id="@+id/searchPortalSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_default"
-        app:layout_constraintTop_toBottomOf="@id/searchBuyToogleButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/searchFilterButton"
-        />
+        <RadioGroup
+            android:id="@+id/searchPortalRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:text="@string/portal_radios"
+            app:layout_constraintTop_toBottomOf="@+id/searchPortalDividerView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/searchFilterButton">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/searchFilterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_default"
-        android:text="@string/search"
-        android:textAllCaps="true"
-        app:layout_constraintTop_toBottomOf="@id/searchPortalSpinner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/searchNoFilterRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_filter"
+                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "ALL" || viewModel.filterMap[FilterType.PORTAL] == null ? true : false}'
+                />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/searchZapRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zap"
+                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "ZAP" &amp;&amp; viewModel.filterMap[FilterType.PORTAL] != null ? true : false}'
+                />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/searchVivaRealRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/viva_real"
+                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "VIVA_REAL" &amp;&amp; viewModel.filterMap[FilterType.PORTAL] == null ? true : false}'
+                />
+
+        </RadioGroup>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/searchFilterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/search"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toBottomOf="@id/searchPortalRadioGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
