@@ -13,4 +13,7 @@ object Constants {
     const val GRUPO_ZAP_RENTAL_MIN_PRICE_ZAP = 3500
     const val GRUPO_ZAP_SALE_MAX_PRICE_VIVA_REAL = 700000
     const val GRUPO_ZAP_SALE_MIN_PRICE_ZAP = 600000
+
+    // SHARED PREFERENCES
+    const val GRUPO_ZAP_PREFERENCES = "br.com.desafio.grupozap.GLOBAL_PREFERENCES"
 }

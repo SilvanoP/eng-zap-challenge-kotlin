@@ -1,6 +1,7 @@
 package br.com.desafio.grupozap.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import br.com.desafio.grupozap.data.DataRepositoryImpl
 import br.com.desafio.grupozap.data.network.CacheInterceptor
 import br.com.desafio.grupozap.data.network.GrupoZapService
@@ -53,5 +54,12 @@ object DataModule {
     @JvmStatic
     fun providesDataRepository(dataRepositoryImpl: DataRepositoryImpl): DataRepository {
         return dataRepositoryImpl
+    }
+
+    @Provides
+    @Singleton
+    @JvmStatic
+    fun providesPreferences(context: Context): SharedPreferences {
+        return context.getSharedPreferences(Constants.GRUPO_ZAP_PREFERENCES, Context.MODE_PRIVATE)
     }
 }

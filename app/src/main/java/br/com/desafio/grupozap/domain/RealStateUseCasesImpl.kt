@@ -8,8 +8,10 @@ import br.com.desafio.grupozap.utils.Constants
 import br.com.desafio.grupozap.utils.Utils
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 private const val PAGE_SIZE = 20
 
@@ -18,7 +20,7 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
     private val cachedFilteredStates: MutableList<RealState> = ArrayList()
-    private var filterMap: Map<Int, String> = HashMap()
+    private var filterMap: Map<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
     private var lastLegalStatesIndex = 0
 
     override suspend fun refreshCachedLegalStates(): Boolean {
@@ -85,7 +87,7 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
     override fun clearFilter() {cachedFilteredStates.clear()}
 
-    override suspend fun getByFilter(filterMap: Map<Int, String>): List<RealState> {
+    override suspend fun getByFilter(filterMap: Map<FilterType, String>): List<RealState> {
         this.filterMap = filterMap
 
         return getNextPage(0)
@@ -111,28 +113,28 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
 
                 filterMap.keys.forEach { key ->
                     when(key) {
-                        FilterType.LOCATION.filterValue ->
+                        FilterType.LOCATION ->
                             if (state.address.city != filterMap[key]
                                 && state.address.neighborhood != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
-                        FilterType.TYPE.filterValue ->
+                        FilterType.TYPE ->
                             if (state.pricingInfos.businessType != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
-                        FilterType.PORTAL.filterValue ->
+                        FilterType.PORTAL ->
                             if (state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
                                 matchFilter = false
                                 return@forEach
                             }
-                        FilterType.PRICE.filterValue ->
+                        FilterType.PRICE ->
                             if (state.pricingInfos.price > filterMap[key]?.toInt()?: 0) {
                                 matchFilter = false
                                 return@forEach
                             }
-                        FilterType.BEDROOMS.filterValue -> {
+                        FilterType.BEDROOMS -> {
                             val bedroom = filterMap[key]?.toInt()?:0
                             if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
                                 matchFilter = false
