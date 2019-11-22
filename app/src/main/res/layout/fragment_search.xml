@@ -129,6 +129,32 @@
 
         </RadioGroup>
 
+        <TextView
+            android:id="@+id/searchPriceLabelText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_default"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/price_to"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/searchPriceSeekBar"
+            app:layout_constraintStart_toStartOf="@+id/searchPriceSeekBar"
+            app:layout_constraintTop_toBottomOf="@+id/searchPortalRadioGroup" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/searchPriceSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:max="@integer/max_price_interval"
+            android:progress="@{filterMap[FilterType.PRICE] == null ? 10 : filterMap[FilterType.PRICE]}"
+            app:layout_constraintBottom_toTopOf="@+id/searchFilterButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchPriceLabelText"
+            />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/searchFilterButton"
             android:layout_width="wrap_content"
@@ -136,7 +162,7 @@
             android:layout_margin="@dimen/margin_default"
             android:text="@string/search"
             android:textAllCaps="true"
-            app:layout_constraintTop_toBottomOf="@id/searchPortalRadioGroup"
+            app:layout_constraintTop_toBottomOf="@id/searchPriceSeekBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
