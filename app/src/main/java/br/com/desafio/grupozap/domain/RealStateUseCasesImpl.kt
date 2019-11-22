@@ -84,9 +84,6 @@ class RealStateUseCasesImpl @Inject constructor(private val repository: DataRepo
                 && lon <= Constants.GRUPO_ZAP_BOUNDING_BOX_MAX_LON
                 && lon >= Constants.GRUPO_ZAP_BOUNDING_BOX_MIN_LON
 
-
-    override fun clearFilter() {cachedFilteredStates.clear()}
-
     override suspend fun getByFilter(filterMap: Map<FilterType, String>): List<RealState> {
         this.filterMap = filterMap
 
