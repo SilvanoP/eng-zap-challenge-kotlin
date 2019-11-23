@@ -12,5 +12,6 @@
     <string name="zap">Zap</string>
 
     <string name="tools_city">City X</string>
+    <string name="tools_price_to">Until 10000</string>
 
 </resources>

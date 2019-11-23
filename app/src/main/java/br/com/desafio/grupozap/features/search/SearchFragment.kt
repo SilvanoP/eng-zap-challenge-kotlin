@@ -1,14 +1,12 @@
 package br.com.desafio.grupozap.features.search
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-import br.com.desafio.grupozap.R
+import androidx.fragment.app.Fragment
+import br.com.desafio.grupozap.databinding.FragmentSearchBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
 
 /**
@@ -27,7 +25,10 @@ class SearchFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
 
-        return inflater.inflate(R.layout.fragment_search, container, false)
+        val binding = FragmentSearchBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
+
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
