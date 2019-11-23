@@ -98,7 +98,7 @@
         <view
             android:id="@+id/searchPortalDividerView"
             android:layout_width="0dp"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/divider"
             app:layout_constraintBottom_toTopOf="@+id/searchPortalRadioGroup"
             app:layout_constraintStart_toStartOf="@+id/searchPortalRadioGroup"
             app:layout_constraintEnd_toEndOf="@+id/searchPortalRadioGroup"
