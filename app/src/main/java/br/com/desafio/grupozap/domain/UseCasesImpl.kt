@@ -4,22 +4,20 @@ import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.FilterType
 import br.com.desafio.grupozap.utils.PortalType
 import br.com.desafio.grupozap.data.entities.RealState
+import br.com.desafio.grupozap.features.common.RealStateView
 import br.com.desafio.grupozap.utils.Constants
+import br.com.desafio.grupozap.utils.Constants.PAGE_SIZE
 import br.com.desafio.grupozap.utils.Utils
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
-private const val PAGE_SIZE = 20
-
 @Singleton
 class UseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases, FiltersUseCase {
 
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
-    private val cachedFilteredStates: MutableList<RealState> = ArrayList()
+    private val cachedFilteredStates: MutableList<RealStateView> = ArrayList()
     private var filterMap: MutableMap<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
     private var lastLegalStatesIndex = 0
 
@@ -114,26 +112,16 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 && lon <= Constants.GRUPO_ZAP_BOUNDING_BOX_MAX_LON
                 && lon >= Constants.GRUPO_ZAP_BOUNDING_BOX_MIN_LON
 
-    override suspend fun getByFilter(filterMap: Map<FilterType, String>): List<RealState> {
-        this.filterMap = filterMap.toMutableMap()
-
-        return getNextPage(0)
-    }
-
-    override suspend fun getNextPage(page: Int): List<RealState> {
+    override suspend fun getNextPage(page: Int): List<RealStateView> {
         val startIndex = page * PAGE_SIZE
         var endIndex = startIndex + PAGE_SIZE
         if (endIndex > cachedLegalStates.size) {
             endIndex = cachedLegalStates.size
         }
 
-        if (cachedFilteredStates.size == endIndex) {
-            return cachedFilteredStates
-        }
-
         if (filterMap.isEmpty()) {
-            cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex))
-        } else {
+            cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex).map(realStateViewMapper))
+        } else if(cachedFilteredStates.size < endIndex) {
             val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
             auxList.forEachIndexed { index, state ->
                 var matchFilter = true
@@ -172,8 +160,8 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 }
 
                 if (matchFilter) {
-                    cachedFilteredStates.add(state)
-                    if (cachedFilteredStates.size > endIndex+1) {
+                    cachedFilteredStates.add(realStateViewMapper(state))
+                    if (cachedFilteredStates.size > endIndex) {
                         lastLegalStatesIndex += index
                         return@forEachIndexed
                     }
@@ -182,5 +170,23 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         }
 
         return cachedFilteredStates
+    }
+
+    private val realStateViewMapper: (RealState) -> RealStateView = {
+        RealState ->
+        RealStateView(
+            RealState.usableAreas,
+            RealState.parkingSpaces,
+            RealState.images,
+            RealState.bedrooms,
+            RealState.portal,
+            RealState.address.city,
+            RealState.address.neighborhood,
+            RealState.pricingInfos.yearlyIptu,
+            RealState.pricingInfos.price,
+            RealState.pricingInfos.rentalTotalPrice,
+            RealState.pricingInfos.businessType,
+            RealState.pricingInfos.monthlyCondoFee
+        )
     }
 }

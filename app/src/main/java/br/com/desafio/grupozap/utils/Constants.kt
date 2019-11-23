@@ -3,6 +3,7 @@ package br.com.desafio.grupozap.utils
 object Constants {
 
     const val BASE_URL = "http://grupozap-code-challenge.s3-website-us-east-1.amazonaws.com/"
+    const val PAGE_SIZE = 20
 
     // GRUPO ZAP CONSTANTS
     const val GRUPO_ZAP_BOUNDING_BOX_MAX_LAT: Double = 23.54686
