@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
 import br.com.desafio.grupozap.R
+import br.com.desafio.grupozap.features.list.ListFragment
+import br.com.desafio.grupozap.features.list.ListViewModel
 import br.com.desafio.grupozap.features.search.SearchFragment
 import br.com.desafio.grupozap.features.search.SearchViewModel
 import dagger.android.AndroidInjection
@@ -49,7 +51,10 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     }
 
     override fun onSearchEnded() {
+        val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
+        currentFragment = ListFragment.newInstance(listViewModel)
 
+        refreshFragment()
     }
 
     override fun onRealStateSelected() {

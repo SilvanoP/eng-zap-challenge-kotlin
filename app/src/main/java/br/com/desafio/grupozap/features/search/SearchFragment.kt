@@ -5,18 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import br.com.desafio.grupozap.databinding.FragmentSearchBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
+import br.com.desafio.grupozap.utils.BusinessType
+import br.com.desafio.grupozap.utils.PortalType
+import kotlinx.android.synthetic.main.fragment_search.*
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [NavigationListener] interface
- * to handle interaction events.
- * Use the [SearchFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SearchFragment : Fragment() {
 
     lateinit var viewModel: SearchViewModel
@@ -26,9 +22,57 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?): View? {
 
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.viewModel = viewModel
+        subscribeUI(binding)
+
+        loadListeners()
 
         return binding.root
+    }
+
+    private fun subscribeUI(binding: FragmentSearchBinding) {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        this.lifecycle.addObserver(viewModel)
+        viewModel.finishedSearch.observe(binding.lifecycleOwner!!, androidx.lifecycle.Observer {
+            if (it) {
+                listener?.onSearchEnded()
+            }
+        })
+    }
+
+    private fun loadListeners() {
+        searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                var businessType = ""
+                if (searchBuyToggleButton.isChecked) {
+                    businessType = BusinessType.SALE.toString()
+                } else if (searchRentToggleButton.isChecked) {
+                    businessType = BusinessType.RENTAL.toString()
+                }
+                viewModel.getPriceByRate(progress, businessType)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
+
+        searchFilterButton.setOnClickListener {
+            saveFilter()
+        }
+    }
+
+    private fun saveFilter() {
+        val location: String? = searchCityNeighborhoodAutoComplete.text.toString()
+        val buy = searchBuyToggleButton.isChecked
+        val rental = searchRentToggleButton.isChecked
+        val portal = when(searchPortalRadioGroup.checkedRadioButtonId) {
+            searchZapRadioButton.id -> PortalType.ZAP.toString()
+            searchVivaRealRadioButton.id -> PortalType.VIVA_REAL.toString()
+            else -> ""
+        }
+        val price = searchPriceSeekBar.progress
+        viewModel.saveFilter(location, buy, rental, portal, price)
     }
 
     override fun onAttach(context: Context) {
@@ -46,17 +90,9 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @return A new instance of fragment SearchFragment.
-         */
         @JvmStatic
-        fun newInstance(searchViewModel: SearchViewModel): SearchFragment {
-            val fragment = SearchFragment()
-            fragment.viewModel = searchViewModel
-            return fragment
+        fun newInstance(searchViewModel: SearchViewModel) = SearchFragment().apply {
+            this.viewModel = searchViewModel
         }
     }
 }

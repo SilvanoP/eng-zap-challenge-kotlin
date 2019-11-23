@@ -95,6 +95,19 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         }
     }
 
+    override fun getPrice(index: Int, businessType: String?): Int {
+        val prince = 0
+        if (!businessType.isNullOrEmpty()) {
+            if (BusinessType.SALE.toString() == businessType) {
+                return 100000 + (index * 50000)
+            }
+
+            return 1000 + (index * 1000)
+        }
+
+        return prince
+    }
+
     private fun isOnBoundingBox(lat: Double, lon: Double): Boolean =
         lat <= Constants.GRUPO_ZAP_BOUNDING_BOX_MAX_LAT
                 && lat >= Constants.GRUPO_ZAP_BOUNDING_BOX_MIN_LAT

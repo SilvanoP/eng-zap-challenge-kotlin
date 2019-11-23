@@ -6,4 +6,5 @@ interface FiltersUseCase {
     suspend fun refreshCachedLegalStates(): Boolean
     suspend fun getFilters(): Map<FilterType, String>
     suspend fun saveFilters(filterMap: Map<FilterType, String>)
+    fun getPrice(index: Int, businessType: String?): Int
 }
