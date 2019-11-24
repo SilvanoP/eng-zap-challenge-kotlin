@@ -6,7 +6,7 @@ import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
 import com.squareup.picasso.Picasso
 
-class RealStateViewPagerAdapter(val imagesURL: List<String>): PagerAdapter() {
+class RealStateViewPagerAdapter(var imagesURL: List<String>): PagerAdapter() {
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean  = view == `object` as ImageView
 
@@ -24,5 +24,10 @@ class RealStateViewPagerAdapter(val imagesURL: List<String>): PagerAdapter() {
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as ImageView)
+    }
+
+    fun swapImages(newImagesUrl: List<String>) {
+        imagesURL = newImagesUrl
+        notifyDataSetChanged()
     }
 }

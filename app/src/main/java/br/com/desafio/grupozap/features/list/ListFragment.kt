@@ -65,6 +65,11 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
         binding.lifecycleOwner = this
         this.lifecycle.addObserver(viewModel)
         viewModel.stateLiveData.observe(this, stateObserver)
+        viewModel.selectedRealState.observe(binding.lifecycleOwner!!, Observer {
+            if (it) {
+                listener?.onRealStateSelected()
+            }
+        })
     }
 
     private fun initRecycler(view: View) {

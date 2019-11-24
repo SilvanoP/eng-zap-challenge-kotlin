@@ -60,7 +60,7 @@ class RealStatesListAdapter(private val realStatesList: MutableList<RealStateVie
             itemView.itemFullPriceText.text = priceFull
             itemView.itemDescPriceText.text = descPrice
 
-            val description = itemView.context.resources.getString(R.string.real_state_details)
+            val description = itemView.context.resources.getString(R.string.real_state_small_details)
                 .format(realState.usableAreas, realState.bedrooms)
             itemView.itemDescriptionText.text = description
 

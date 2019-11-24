@@ -207,7 +207,10 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             RealState.pricingInfos.price ?: 0,
             RealState.pricingInfos.rentalTotalPrice ?: 0,
             RealState.pricingInfos.businessType,
-            RealState.pricingInfos.monthlyCondoFee ?: 0
+            RealState.pricingInfos.monthlyCondoFee ?: 0,
+            RealState.address.geoLocation.location.lat,
+            RealState.address.geoLocation.location.lon
+
         )
     }
 }

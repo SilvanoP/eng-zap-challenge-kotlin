@@ -16,6 +16,9 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
     var loadingData = MutableLiveData<Boolean>().apply {
         value = false
     }
+    var selectedRealState = MutableLiveData<Boolean>().apply {
+        value = false
+    }
 
     fun updateList() {
         val page = getCurrentPage()
@@ -33,7 +36,8 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
     }
 
     fun realStateSelected(index: Int) {
-        useCase.selectRealState(index)
+        val result = useCase.selectRealState(index)
+        selectedRealState.postValue(result)
     }
 
     private fun getRealStatesList(page: Int) {

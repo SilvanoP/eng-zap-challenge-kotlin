@@ -1,17 +1,22 @@
 package br.com.desafio.grupozap.features.detail
 
 import android.content.Context
-import android.net.Uri
+import android.location.Geocoder
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import br.com.desafio.grupozap.R
 import br.com.desafio.grupozap.databinding.FragmentDetailBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
+import br.com.desafio.grupozap.utils.BusinessType
+import br.com.desafio.grupozap.utils.Utils
+import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
+import java.lang.StringBuilder
+import java.util.*
 
 
 class DetailFragment : Fragment() {
@@ -27,9 +32,9 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentDetailBinding.inflate(inflater, container, false)
-        subscribeUI(binding)
         val view = binding.root
         initViewPager(view)
+        subscribeUI(binding)
 
         return view
     }
@@ -38,6 +43,43 @@ class DetailFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         this.lifecycle.addObserver(viewModel)
+        viewModel.realState.observe(binding.lifecycleOwner!!, Observer {
+            if (it != null) {
+                imageAdapter.swapImages(it.images)
+                val address =
+                    if (it.city.isNullOrEmpty() || it.neighborhood.isNullOrEmpty()) getAddressFromGeocode(
+                        it.lat,
+                        it.lon
+                    )
+                    else "%s - %s".format(it.neighborhood, it.city)
+                detailAddressText.text = address
+                val fullPrice =
+                    if (it.businessType == BusinessType.SALE.toString()) it.price else it.rentalTotalPrice
+
+                detailPriceText.text = Utils.fromDoubleToStringTwoDecimal(fullPrice.toDouble())
+                detailBedroomText.text = getString(R.string.bedrooms).format(it.bedrooms)
+                detailCondoFeeText.text = getString(R.string.monthly_condo_fee)
+                    .format(Utils.fromDoubleToStringTwoDecimal(it.monthlyCondoFee.toDouble()))
+                detailYearlyIPTUText.text = getString(R.string.yearly_iptu)
+                    .format(Utils.fromDoubleToStringTwoDecimal(it.yearlyIptu.toDouble()))
+            }
+        })
+    }
+
+    private fun getAddressFromGeocode(lat: Double, lon: Double): String {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val address = geocoder.getFromLocation(lat, lon, 1)[0]
+        val result = StringBuilder().apply {
+            var index = 0
+            var line: String? = ""
+            while(line!=null) {
+                line = address.getAddressLine(index)
+                index++
+                append(line?:"")
+                append(" ")
+            }
+        }
+        return result.toString()
     }
 
     private fun initViewPager(view: View) {

@@ -11,11 +11,13 @@ class RealStateView(
     val images : List<String>,
     val bedrooms : Int,
     var portal: PortalType,
-    val city : String,
-    val neighborhood : String,
+    val city : String?,
+    val neighborhood : String?,
     val yearlyIptu : Int,
     val price : Int,
     val rentalTotalPrice : Int,
     val businessType : String,
-    val monthlyCondoFee : Int
+    val monthlyCondoFee : Int,
+    val lon : Double,
+    val lat : Double
 ): Parcelable
