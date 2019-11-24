@@ -4,6 +4,5 @@ enum class FilterType {
     LOCATION,
     TYPE,
     PORTAL,
-    PRICE,
-    BEDROOMS
+    PRICE
 }

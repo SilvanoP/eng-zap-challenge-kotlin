@@ -1,12 +1,11 @@
 package br.com.desafio.grupozap.domain
 
+import android.util.Log
 import br.com.desafio.grupozap.data.entities.RealState
+import br.com.desafio.grupozap.features.common.FilterView
 import br.com.desafio.grupozap.features.common.RealStateView
-import br.com.desafio.grupozap.utils.BusinessType
-import br.com.desafio.grupozap.utils.Constants
+import br.com.desafio.grupozap.utils.*
 import br.com.desafio.grupozap.utils.Constants.PAGE_SIZE
-import br.com.desafio.grupozap.utils.FilterType
-import br.com.desafio.grupozap.utils.PortalType
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -79,30 +78,58 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         return false
     }
 
-    override suspend fun getFilters(): Map<FilterType, String> {
+    override suspend fun getFilters(): FilterView {
         FilterType.values().forEach {filter ->
             val value: String? = repository.getFilter(filter.toString())
             if(value?.isNotEmpty() != false) {
                 filterMap[filter] = value!!
             }
         }
+        val rate = getRateFromPrice(filterMap[FilterType.PRICE], filterMap[FilterType.TYPE])
 
-        return filterMap
+        return filterViewMapper(filterMap, rate)
     }
 
-    override suspend fun saveFilters(filterMap: Map<FilterType, String>) {
-        filterMap.keys.forEach {filter ->
-            repository.saveFilter(filter.toString(), filterMap.getValue(filter))
+    private fun getRateFromPrice(price:String?, businessType: String?): Int {
+        var rate = 0
+        if (!price.isNullOrEmpty() && Utils.isValidNumber(price) && !businessType.isNullOrEmpty()) {
+            val priceInt = price.toInt()
+            rate = if (businessType == BusinessType.SALE.toString()) (priceInt-100000)/50000 else priceInt/1000
+        }
+
+        return rate
+    }
+
+    override suspend fun saveFilters(location:String?, buy: Boolean, rental: Boolean, portal: String?, price: Int) {
+        if (!location.isNullOrEmpty()) {
+            saveFilter(FilterType.LOCATION, location)
+        }
+        if (buy) {
+            saveFilter(FilterType.TYPE, BusinessType.SALE.toString())
+            saveFilter(FilterType.PRICE, getPrice(price, BusinessType.SALE.toString()).toString())
+        } else if (rental) {
+            saveFilter(FilterType.TYPE, BusinessType.RENTAL.toString())
+            saveFilter(FilterType.PRICE, getPrice(price, BusinessType.RENTAL.toString()).toString())
+        }
+        if (!portal.isNullOrEmpty()) {
+            saveFilter(FilterType.PORTAL, portal)
         }
     }
 
-    override fun getPrice(index: Int, businessType: String?): Int {
-        if (!businessType.isNullOrEmpty() && index > 0) {
+    suspend fun saveFilter(filter: FilterType, value: String) {
+        if (value.isNotEmpty() && value != "0") {
+            filterMap[filter] = value
+            repository.saveFilter(filter.toString(), value)
+        }
+    }
+
+    override fun getPrice(rate: Int, businessType: String?): Int {
+        if (!businessType.isNullOrEmpty() && rate > 0) {
             if (BusinessType.SALE.toString() == businessType) {
-                return 100000 + (index * 50000)
+                return 100000 + (rate * 50000)
             }
 
-            return (index * 1000)
+            return (rate * 1000)
         }
 
         return 0
@@ -131,18 +158,18 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 filterMap.keys.forEach { key ->
                     when(key) {
                         FilterType.LOCATION ->
-                            if (!filterMap[key].isNullOrEmpty() && state.address.city != filterMap[key]
+                            if (state.address.city != filterMap[key]
                                 && state.address.neighborhood != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
                         FilterType.TYPE ->
-                            if (!filterMap[key].isNullOrEmpty() && state.pricingInfos.businessType != filterMap[key]) {
+                            if (state.pricingInfos.businessType != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
                         FilterType.PORTAL ->
-                            if (!filterMap[key].isNullOrEmpty() && state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
+                            if (state.portal.toString() != filterMap[key] && filterMap[key] != PortalType.ALL.toString()) {
                                 matchFilter = false
                                 return@forEach
                             }
@@ -151,14 +178,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                             val realStatePrice =
                                 if (realStateBusinessType == BusinessType.SALE.toString()) state.pricingInfos.price?: 0
                                 else state.pricingInfos.rentalTotalPrice ?: 0
-                            if (!filterMap[key].isNullOrEmpty() && realStatePrice > getPrice(filterMap[key]?.toInt()?: 0, state.pricingInfos.businessType)) {
-                                matchFilter = false
-                                return@forEach
-                            }
-                        }
-                        FilterType.BEDROOMS -> {
-                            val bedroom = filterMap[key]?.toInt()?:10
-                            if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
+                            if (realStatePrice > getPrice(filterMap[key]?.toInt()?: 0, state.pricingInfos.businessType)) {
                                 matchFilter = false
                                 return@forEach
                             }
@@ -200,7 +220,6 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             RealState.parkingSpaces,
             RealState.images,
             RealState.bedrooms,
-            RealState.portal ?: PortalType.ALL,
             RealState.address.city ?: "",
             RealState.address.neighborhood ?: "",
             RealState.pricingInfos.yearlyIptu ?: 0,
@@ -211,6 +230,17 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             RealState.address.geoLocation.location.lat,
             RealState.address.geoLocation.location.lon
 
+        )
+    }
+
+    private val filterViewMapper: (Map<FilterType, String>, rate: Int) -> FilterView = {
+        filterMap, rate ->
+        FilterView(
+            filterMap[FilterType.LOCATION] ?: "",
+            filterMap[FilterType.TYPE] == BusinessType.SALE.toString(),
+            filterMap[FilterType.PORTAL] ?: PortalType.ALL.toString(),
+            filterMap[FilterType.PRICE] ?: "0",
+            rate
         )
     }
 }

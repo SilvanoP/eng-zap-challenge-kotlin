@@ -10,7 +10,7 @@
     <string name="price_desc_rental">Rental: R$%1$s + Condo Fee: R$%2$s &#8226; Yearly IPTU: R$%3$s</string>
     <string name="price_desc_sale">Condo Fee: R$%1$s &#8226; Yearly IPTU: R$%2$s</string>
     <string name="price_full">R$ %s</string>
-    <string name="price_to">Until %s</string>
+    <string name="price_to">Until R$%s</string>
     <string name="real_state_small_details">Area: %1$d m\u00B2 &#8226; Bedrooms: %2$d</string>
     <string name="rent">Rent</string>
     <string name="search">Search</string>

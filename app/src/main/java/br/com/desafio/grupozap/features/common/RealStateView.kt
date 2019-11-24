@@ -5,12 +5,11 @@ import br.com.desafio.grupozap.utils.PortalType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class RealStateView(
+data class RealStateView(
     val usableAreas : Int,
     val parkingSpaces : Int,
     val images : List<String>,
     val bedrooms : Int,
-    var portal: PortalType,
     val city : String?,
     val neighborhood : String?,
     val yearlyIptu : Int,

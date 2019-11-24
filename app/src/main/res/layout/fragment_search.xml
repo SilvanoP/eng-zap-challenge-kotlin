@@ -5,8 +5,6 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="java.util.Map"/>
-        <import type="br.com.desafio.grupozap.utils.FilterType"/>
         <variable name="viewModel" type="br.com.desafio.grupozap.features.search.SearchViewModel"/>
 
     </data>
@@ -40,12 +38,12 @@
             app:layout_constraintBottom_toTopOf="@+id/searchBuyToggleButton"
             >
 
-            <AutoCompleteTextView
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/searchCityNeighborhoodAutoComplete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/city_neighborhood"
-                android:text="@{viewModel.filterMap[FilterType.LOCATION] ?? viewModel.filterMap[FilterType.LOCATION]}"
+                android:text="@{viewModel.filterView.location}"
                 tools:text="@string/tools_city"
                 />
 
@@ -53,13 +51,16 @@
 
         <androidx.appcompat.widget.AppCompatToggleButton
             android:id="@+id/searchBuyToggleButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_default"
+            android:layout_marginTop="@dimen/margin_default"
+            android:layout_marginStart="@dimen/margin_default"
+            android:layout_marginBottom="@dimen/margin_default"
+            android:background="@drawable/toggle_selector"
             android:textOn="@string/buy"
             android:textOff="@string/buy"
             android:textAllCaps="true"
-            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "SALE" ? true : false}'
+            android:checked='@{viewModel.filterView.forSale}'
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintTop_toBottomOf="@id/searchCityNeighborhoodInputLayout"
             app:layout_constraintStart_toStartOf="parent"
@@ -69,13 +70,16 @@
 
         <androidx.appcompat.widget.AppCompatToggleButton
             android:id="@+id/searchRentToggleButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_default"
+            android:layout_marginTop="@dimen/margin_default"
+            android:layout_marginEnd="@dimen/margin_default"
+            android:layout_marginBottom="@dimen/margin_default"
+            android:background="@drawable/toggle_selector"
             android:textOn="@string/rent"
             android:textOff="@string/rent"
             android:textAllCaps="true"
-            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "RENTAL" ? true : false}'
+            android:checked='@{!viewModel.filterView.forSale}'
             app:layout_constraintTop_toTopOf="@id/searchBuyToggleButton"
             app:layout_constraintStart_toEndOf="@id/searchBuyToggleButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -99,6 +103,7 @@
             android:id="@+id/searchPortalDividerView"
             android:layout_width="0dp"
             android:layout_height="@dimen/divider"
+            android:background="@color/colorAccent"
             app:layout_constraintBottom_toTopOf="@+id/searchPortalRadioGroup"
             app:layout_constraintStart_toStartOf="@+id/searchPortalRadioGroup"
             app:layout_constraintEnd_toEndOf="@+id/searchPortalRadioGroup"
@@ -120,7 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_filter"
-                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "ALL" || viewModel.filterMap[FilterType.PORTAL] == null ? true : false}'
+                android:checked='@{viewModel.filterView.portal == "ALL" ? true : false}'
                 />
 
             <androidx.appcompat.widget.AppCompatRadioButton
@@ -128,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/zap"
-                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "ZAP" &amp;&amp; viewModel.filterMap[FilterType.PORTAL] != null ? true : false}'
+                android:checked='@{viewModel.filterView.portal == "ZAP" ? true : false}'
                 />
 
             <androidx.appcompat.widget.AppCompatRadioButton
@@ -136,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/viva_real"
-                android:checked='@{viewModel.filterMap[FilterType.PORTAL] == "VIVA_REAL" &amp;&amp; viewModel.filterMap[FilterType.PORTAL] == null ? true : false}'
+                android:checked='@{viewModel.filterView.portal == "VIVA_REAL" ? true : false}'
                 />
 
         </RadioGroup>
@@ -148,7 +153,7 @@
             android:layout_marginTop="@dimen/margin_default"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:text='@{String.format(@string/price_to, viewModel.untilPrice)}'
+            android:text='@{String.format(@string/price_to, viewModel.filterView.priceLabel)}'
             android:textSize="15sp"
             tools:text="@string/tools_price_to"
             app:layout_constraintBottom_toTopOf="@+id/searchPriceSeekBar"
@@ -163,7 +168,7 @@
             android:layout_marginEnd="@dimen/margin_default"
             android:layout_marginBottom="@dimen/margin_default"
             android:max="@integer/max_price_interval"
-            android:progress='@{viewModel.filterMap[FilterType.PRICE] == null ? 0 : Integer.parseInt(viewModel.filterMap[FilterType.PRICE])}'
+            android:progress='@{viewModel.filterView.priceRate}'
             app:layout_constraintBottom_toTopOf="@+id/searchFilterButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

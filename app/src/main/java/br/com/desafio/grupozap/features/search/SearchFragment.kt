@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import br.com.desafio.grupozap.R
 import br.com.desafio.grupozap.databinding.FragmentSearchBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
 import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.PortalType
+import br.com.desafio.grupozap.utils.Utils
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.fragment_search.view.*
 
@@ -49,6 +51,25 @@ class SearchFragment : Fragment() {
     }
 
     private fun loadListeners(view: View) {
+        view.searchBuyToggleButton.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.filterForSale(isChecked)
+        }
+
+        view.searchRentToggleButton.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.filterForRent(isChecked)
+        }
+
+        view.searchPortalRadioGroup.setOnCheckedChangeListener { _, radioButtonId ->
+            when(radioButtonId) {
+                view.searchNoFilterRadioButton.id ->
+                    viewModel.filterByPortal(PortalType.ALL.toString())
+                view.searchZapRadioButton.id ->
+                    viewModel.filterByPortal(PortalType.ZAP.toString())
+                view.searchVivaRealRadioButton.id ->
+                    viewModel.filterByPortal(PortalType.VIVA_REAL.toString())
+            }
+        }
+
         view.searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 var businessType = ""
@@ -77,6 +98,7 @@ class SearchFragment : Fragment() {
         val portal = when(searchPortalRadioGroup.checkedRadioButtonId) {
             searchZapRadioButton.id -> PortalType.ZAP.toString()
             searchVivaRealRadioButton.id -> PortalType.VIVA_REAL.toString()
+            searchNoFilterRadioButton.id -> PortalType.ALL.toString()
             else -> ""
         }
         val price = searchPriceSeekBar.progress
