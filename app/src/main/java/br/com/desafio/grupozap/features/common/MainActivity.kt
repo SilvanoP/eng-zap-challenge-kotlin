@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
 import br.com.desafio.grupozap.R
+import br.com.desafio.grupozap.features.detail.DetailFragment
+import br.com.desafio.grupozap.features.detail.DetailViewModel
 import br.com.desafio.grupozap.features.list.ListFragment
 import br.com.desafio.grupozap.features.list.ListViewModel
 import br.com.desafio.grupozap.features.search.SearchFragment
@@ -58,7 +60,10 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     }
 
     override fun onRealStateSelected() {
+        val detailViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
+        currentFragment = DetailFragment.newInstance(detailViewModel)
 
+        refreshFragment()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
