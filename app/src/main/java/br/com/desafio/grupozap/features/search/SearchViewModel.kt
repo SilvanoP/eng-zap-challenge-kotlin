@@ -29,16 +29,13 @@ class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObser
         loadingData.postValue(true)
         GlobalScope.launch {
             val result = useCase.refreshCachedLegalStates()
-        }
 
-        GlobalScope.launch {
             val filter = useCase.getFilters()
             if (filter.isNotEmpty()) {
                 filterMap.postValue(filter)
             }
-
-            loadingData.postValue(false)
         }
+        loadingData.postValue(false)
     }
 
     fun getPriceByRate(rate: Int, businessType: String) {
@@ -66,9 +63,8 @@ class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObser
         loadingData.postValue(true)
         GlobalScope.launch {
             useCase.saveFilters(filters)
-            loadingData.postValue(false)
-            finishedSearch.postValue(false)
-
+            finishedSearch.postValue(true)
         }
+        loadingData.postValue(false)
     }
 }

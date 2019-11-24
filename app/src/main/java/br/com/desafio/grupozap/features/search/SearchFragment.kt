@@ -2,11 +2,13 @@ package br.com.desafio.grupozap.features.search
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import br.com.desafio.grupozap.databinding.FragmentSearchBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
 import br.com.desafio.grupozap.utils.BusinessType
@@ -37,6 +39,11 @@ class SearchFragment : Fragment() {
         viewModel.finishedSearch.observe(binding.lifecycleOwner!!, androidx.lifecycle.Observer {
             if (it) {
                 listener?.onSearchEnded()
+            }
+        })
+        viewModel.loadingData.observe(binding.lifecycleOwner!!, Observer {
+            searchProgressBar.apply {
+                visibility = if (it) View.VISIBLE else View.GONE
             }
         })
     }
