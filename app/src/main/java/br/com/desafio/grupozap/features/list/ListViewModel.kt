@@ -1,16 +1,14 @@
 package br.com.desafio.grupozap.features.list
 
-import android.app.Application
 import androidx.lifecycle.*
-import br.com.desafio.grupozap.domain.RealStateUseCases
+import br.com.desafio.grupozap.domain.ListRealStatesUseCases
 import br.com.desafio.grupozap.features.common.RealStateView
 import br.com.desafio.grupozap.utils.Constants
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ListViewModel (val useCase: RealStateUseCases): ViewModel(), LifecycleObserver {
+class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), LifecycleObserver {
 
     var stateLiveData = MutableLiveData<RealStatesListState>().apply {
         value = DefaultState(0, false, emptyList())
@@ -32,6 +30,10 @@ class ListViewModel (val useCase: RealStateUseCases): ViewModel(), LifecycleObse
     fun restoreList() {
         val page = getCurrentPage()
         stateLiveData.value = DefaultState(page, false, getCurrentRealStates())
+    }
+
+    fun realStateSelected(index: Int) {
+        useCase.selectRealState(index)
     }
 
     private fun getRealStatesList(page: Int) {

@@ -13,11 +13,14 @@ import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
 @Singleton
-class UseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases, FiltersUseCase {
+class UseCasesImpl @Inject constructor(private val repository: DataRepository): ListRealStatesUseCases,
+    FiltersUseCase, RealStateUseCases {
 
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
     private var filterMap: MutableMap<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
+    private var cachedFilteredStates: MutableList<RealState> = ArrayList()
     private var lastLegalStatesIndex = 0
+    private lateinit var selectedRealState: RealState
 
     override suspend fun refreshCachedLegalStates(): Boolean {
         val result = repository.getAllRealStates()
@@ -118,9 +121,9 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             endIndex = cachedLegalStates.size
         }
 
-        val cachedFilteredStates: MutableList<RealStateView> = ArrayList()
+        val filteredStates: MutableList<RealStateView> = ArrayList()
 
-        if(cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
+        if(filteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
             val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
             auxList.forEachIndexed { index, state ->
                 var matchFilter = true
@@ -164,8 +167,9 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 }
 
                 if (matchFilter) {
-                    cachedFilteredStates.add(realStateViewMapper(state))
-                    if (cachedFilteredStates.size > endIndex) {
+                    cachedFilteredStates.add(state)
+                    filteredStates.add(realStateViewMapper(state))
+                    if (filteredStates.size > endIndex) {
                         lastLegalStatesIndex += index
                         return@forEachIndexed
                     }
@@ -173,7 +177,20 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             }
         }
 
-        return cachedFilteredStates
+        return filteredStates
+    }
+
+    override fun selectRealState(index: Int): Boolean {
+        if (cachedFilteredStates.size > index) {
+            selectedRealState = cachedFilteredStates[index]
+            return true
+        }
+
+        return false
+    }
+
+    override fun getSelectedRealState(): RealStateView {
+        return realStateViewMapper(selectedRealState)
     }
 
     private val realStateViewMapper: (RealState) -> RealStateView = {

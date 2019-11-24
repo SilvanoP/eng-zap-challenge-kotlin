@@ -68,11 +68,11 @@ class RealStatesListAdapter(private val realStatesList: MutableList<RealStateVie
         }
 
         override fun onClick(v: View?) {
-            listener.onItemSelected(realStatesList[adapterPosition])
+            listener.onItemSelected(adapterPosition)
         }
     }
 
     interface AdapterClickListener {
-        fun onItemSelected(realState: RealStateView)
+        fun onItemSelected(index: Int)
     }
 }

@@ -80,8 +80,8 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
         viewModel.updateList()
     }
 
-    override fun onItemSelected(realState: RealStateView) {
-
+    override fun onItemSelected(index: Int) {
+        viewModel.realStateSelected(index)
     }
 
     override fun onAttach(context: Context) {
