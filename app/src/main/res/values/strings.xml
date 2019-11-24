@@ -3,11 +3,11 @@
 
     <string name="buy">Buy</string>
     <string name="city_neighborhood">Type City or Neighborhood</string>
-    <string name="real_state_details">Area: %1$d m &#8226; Bedrooms: %2$d</string>
+    <string name="real_state_details">Area: %1$d m\u00B2 &#8226; Bedrooms: %2$d</string>
     <string name="no_filter">Both</string>
     <string name="portal_radios">Choose Portal</string>
-    <string name="price_desc_rental">Rental: %1$d + Condo Fee: %2$d &#8226; Yearly IPTU: %3$d</string>
-    <string name="price_desc_sale">Sale: %1$d &#8226; Yearly IPTU: %3$d</string>
+    <string name="price_desc_rental">Rental: R$%1$s + Condo Fee: R$%2$s &#8226; Yearly IPTU: R$%3$s</string>
+    <string name="price_desc_sale">Condo Fee: R$%1$s &#8226; Yearly IPTU: R$%2$s</string>
     <string name="price_full">R$ %s</string>
     <string name="price_to">Until %s</string>
     <string name="rent">Rent</string>

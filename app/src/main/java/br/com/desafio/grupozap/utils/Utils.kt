@@ -8,4 +8,8 @@ object Utils {
     fun isValidNumber(number: String?): Boolean {
         return number?.isDigitsOnly() ?: false
     }
+
+    fun fromDoubleToStringTwoDecimal(value: Double): String {
+        return String.format("%.2f", value)
+    }
 }

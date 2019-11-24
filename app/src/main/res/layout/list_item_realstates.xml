@@ -3,7 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/card_margin_list"
+    android:layout_gravity="start"
+    android:elevation="@dimen/card_elevation"
     app:cardCornerRadius="@dimen/card_corner_radius">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,7 +20,6 @@
             android:adjustViewBounds="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/itemFullPriceText"
             />
 
@@ -25,9 +27,11 @@
             android:id="@+id/itemFullPriceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_default"
+            android:textSize="@dimen/card_title_text_size"
+            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/itemPhotoImage"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/itemDescPriceText"
             tools:text="@string/tools_price_to"
             />
@@ -36,9 +40,9 @@
             android:id="@+id/itemDescPriceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_default"
             app:layout_constraintTop_toBottomOf="@+id/itemFullPriceText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/itemDescriptionText"
             tools:text="@string/tools_price_to"
             />
@@ -47,9 +51,9 @@
             android:id="@+id/itemDescriptionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_default"
             app:layout_constraintTop_toBottomOf="@+id/itemDescPriceText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/itemDividerView"
             tools:text="@string/tools_price_to"
             />
@@ -58,6 +62,7 @@
             android:id="@+id/itemDividerView"
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider"
+            android:layout_marginStart="@dimen/margin_default"
             app:layout_constraintTop_toBottomOf="@+id/itemDescriptionText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,9 +73,9 @@
             android:id="@+id/itemLocationText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_default"
             app:layout_constraintTop_toBottomOf="@+id/itemDividerView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="@string/city_neighborhood"
             />

@@ -5,7 +5,6 @@ import br.com.desafio.grupozap.domain.FiltersUseCase
 import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.FilterType
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -36,7 +35,7 @@ class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObser
             if (filter.isNotEmpty()) {
                 filterMap.postValue(filter)
             }
-            loadingData.postValue(result)
+            loadingData.postValue(!result)
         }
     }
 
@@ -47,24 +46,30 @@ class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObser
 
     fun saveFilter(location:String?, buy: Boolean, rental: Boolean, portal: String?, price: Int) {
         val filters: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
-        filters[FilterType.LOCATION] = location ?: ""
-        var type = ""
-        if (buy) {
-            type = BusinessType.SALE.toString()
+        if (!location.isNullOrEmpty()) {
+            filters[FilterType.LOCATION] = location
         }
-        else if (rental) {
-            type = BusinessType.RENTAL.toString()
+        if (buy || rental) {
+            val type = if (buy) {
+                BusinessType.SALE.toString()
+            }
+            else {
+                BusinessType.RENTAL.toString()
+            }
+            filters[FilterType.TYPE] = type
         }
-        else {
-            type = ""
+        if (!portal.isNullOrEmpty()) {
+            filters[FilterType.PORTAL] = portal
         }
-        filters[FilterType.TYPE] = type
-        filters[FilterType.PORTAL] = portal ?: ""
-        filters[FilterType.PRICE] = price.toString()
+        if (price > 0) {
+            filters[FilterType.PRICE] = price.toString()
+        }
 
         loadingData.postValue(true)
-        GlobalScope.launch {
-            useCase.saveFilters(filters)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                useCase.saveFilters(filters)
+            }
             finishedSearch.postValue(true)
         }
         loadingData.postValue(false)

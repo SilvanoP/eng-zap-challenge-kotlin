@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.desafio.grupozap.R
 import br.com.desafio.grupozap.features.common.RealStateView
 import br.com.desafio.grupozap.utils.BusinessType
+import br.com.desafio.grupozap.utils.Utils
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.list_item_realstates.view.*
 
@@ -41,20 +42,21 @@ class RealStatesListAdapter(private val realStatesList: MutableList<RealStateVie
         }
 
         fun bind(realState: RealStateView) {
-            //TODO USE PLACEHOLDER WHEN NOT AVAILABLE
             val imageUri = realState.images[0]
             Picasso.get().load(imageUri)
                 .into(itemView.itemPhotoImage)
 
             var price = realState.price
-            var descPrice = itemView.context.resources.getString(R.string.price_desc_sale).format(realState.price, realState.yearlyIptu)
+            var descPrice = itemView.context.resources.getString(R.string.price_desc_sale)
+                .format(Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()), realState.yearlyIptu)
             if (realState.businessType == BusinessType.RENTAL.toString()) {
-                val monthlyCondoFee = realState.monthlyCondoFee?.toInt()?:0
-                price = realState.rentalTotalPrice + monthlyCondoFee
+                price = realState.rentalTotalPrice
                 descPrice = itemView.context.resources.getString(R.string.price_desc_rental)
-                    .format(realState.rentalTotalPrice, realState.monthlyCondoFee, realState.yearlyIptu)
+                    .format(Utils.fromDoubleToStringTwoDecimal(realState.price.toDouble()),
+                        Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()),
+                        Utils.fromDoubleToStringTwoDecimal(realState.yearlyIptu.toDouble()))
             }
-            val priceFull = itemView.context.resources.getString(R.string.price_full).format(price)
+            val priceFull = itemView.context.resources.getString(R.string.price_full).format(Utils.fromDoubleToStringTwoDecimal(price.toDouble()))
             itemView.itemFullPriceText.text = priceFull
             itemView.itemDescPriceText.text = descPrice
 

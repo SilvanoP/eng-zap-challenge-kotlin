@@ -17,5 +17,5 @@ class RealStateView(
     val price : Int,
     val rentalTotalPrice : Int,
     val businessType : String,
-    val monthlyCondoFee : String?
+    val monthlyCondoFee : Int
 ): Parcelable

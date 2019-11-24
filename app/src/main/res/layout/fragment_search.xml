@@ -75,7 +75,7 @@
             android:textOn="@string/rent"
             android:textOff="@string/rent"
             android:textAllCaps="true"
-            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "SALE" ? false : true}'
+            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "RENTAL" ? true : false}'
             app:layout_constraintTop_toTopOf="@id/searchBuyToggleButton"
             app:layout_constraintStart_toEndOf="@id/searchBuyToggleButton"
             app:layout_constraintEnd_toEndOf="parent"

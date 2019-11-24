@@ -1,14 +1,12 @@
 package br.com.desafio.grupozap.domain
 
-import android.util.Log
-import br.com.desafio.grupozap.utils.BusinessType
-import br.com.desafio.grupozap.utils.FilterType
-import br.com.desafio.grupozap.utils.PortalType
 import br.com.desafio.grupozap.data.entities.RealState
 import br.com.desafio.grupozap.features.common.RealStateView
+import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.Constants
 import br.com.desafio.grupozap.utils.Constants.PAGE_SIZE
-import br.com.desafio.grupozap.utils.Utils
+import br.com.desafio.grupozap.utils.FilterType
+import br.com.desafio.grupozap.utils.PortalType
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +21,6 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
 
     override suspend fun refreshCachedLegalStates(): Boolean {
         val result = repository.getAllRealStates()
-        Log.d("USE CASE", "Result: " + result.size)
         result.forEach {
             // verify if each real state is eligible for Zap or Viva Real or none
             val lat = it.address.geoLocation.location.lat
@@ -31,37 +28,38 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             if(lat != 0.0 && lon != 0.0) {
                 it.apply {
                     val monthlyCondoFee = pricingInfos.monthlyCondoFee
+                    val price = pricingInfos.price ?: 0
+                    val rentalTotalPrice = pricingInfos.rentalTotalPrice ?: 0
                     val isInBoundBox = isOnBoundingBox(lat, lon)
 
                     if (pricingInfos.businessType == BusinessType.SALE.toString()
                         && usableAreas > 0) {
                         // Rules for sale
-                        val pricePerSquareMeter = pricingInfos.price.toDouble()/usableAreas // convert to double
+                        val pricePerSquareMeter = price.toDouble()/usableAreas // convert to double
                         var zapMinSalePrice = Constants.GRUPO_ZAP_SALE_MIN_PRICE_ZAP
                         if (isInBoundBox) {
                             zapMinSalePrice -= zapMinSalePrice / 10 // If on bounding box is 10% cheaper
                         }
 
-                        if (pricingInfos.price > Constants.GRUPO_ZAP_SALE_MAX_PRICE_VIVA_REAL && pricePerSquareMeter > 3500.0) {
+                        if (price > Constants.GRUPO_ZAP_SALE_MAX_PRICE_VIVA_REAL && pricePerSquareMeter > 3500.0) {
                             portal = PortalType.ZAP
-                        } else if (pricingInfos.price < zapMinSalePrice || pricePerSquareMeter <= 3500.0) {
+                        } else if (price < zapMinSalePrice || pricePerSquareMeter <= 3500.0) {
                             portal = PortalType.VIVA_REAL
                         }
 
                         cachedLegalStates.add(this)
-                    } else if (pricingInfos.businessType == BusinessType.RENTAL.toString()
-                        && Utils.isValidNumber(monthlyCondoFee)) {
+                    } else if (pricingInfos.businessType == BusinessType.RENTAL.toString()) {
                         // Rules for rental
-                        val rateCondoRentPrice: Double = pricingInfos.rentalTotalPrice.toDouble() / monthlyCondoFee!!.toInt()
+                        val rateCondoRentPrice: Double = price.toDouble() / monthlyCondoFee!!.toInt()
                         var vivaRealMaxPrice = Constants.GRUPO_ZAP_RENTAL_MAX_PRICE_VIVA_REAL
                         if (isInBoundBox) {
                             vivaRealMaxPrice += vivaRealMaxPrice / 2
                         }
 
-                        if (pricingInfos.rentalTotalPrice <= Constants.GRUPO_ZAP_RENTAL_MIN_PRICE_ZAP
+                        if (rentalTotalPrice <= Constants.GRUPO_ZAP_RENTAL_MIN_PRICE_ZAP
                             && rateCondoRentPrice < 30) {
                             portal = PortalType.VIVA_REAL
-                        } else if (pricingInfos.rentalTotalPrice > Constants.GRUPO_ZAP_RENTAL_MAX_PRICE_VIVA_REAL
+                        } else if (rentalTotalPrice > Constants.GRUPO_ZAP_RENTAL_MAX_PRICE_VIVA_REAL
                             || rateCondoRentPrice >= 30) {
                             portal = PortalType.ZAP
                         }
@@ -72,7 +70,6 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             }
         }
 
-        Log.d("USE CASE", "Cached: " + cachedLegalStates.size)
         if(cachedLegalStates.size > 0)
             return true
 
@@ -97,16 +94,15 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     }
 
     override fun getPrice(index: Int, businessType: String?): Int {
-        val prince = 0
-        if (!businessType.isNullOrEmpty()) {
+        if (!businessType.isNullOrEmpty() && index > 0) {
             if (BusinessType.SALE.toString() == businessType) {
                 return 100000 + (index * 50000)
             }
 
-            return 1000 + (index * 1000)
+            return (index * 1000)
         }
 
-        return prince
+        return 0
     }
 
     private fun isOnBoundingBox(lat: Double, lon: Double): Boolean =
@@ -124,9 +120,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
 
         val cachedFilteredStates: MutableList<RealStateView> = ArrayList()
 
-        if (filterMap.isEmpty()) {
-            cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex).map(realStateViewMapper))
-        } else if(cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
+        if(cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
             val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
             auxList.forEachIndexed { index, state ->
                 var matchFilter = true
@@ -134,28 +128,33 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 filterMap.keys.forEach { key ->
                     when(key) {
                         FilterType.LOCATION ->
-                            if (state.address.city != filterMap[key]
+                            if (!filterMap[key].isNullOrEmpty() && state.address.city != filterMap[key]
                                 && state.address.neighborhood != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
                         FilterType.TYPE ->
-                            if (state.pricingInfos.businessType != filterMap[key]) {
+                            if (!filterMap[key].isNullOrEmpty() && state.pricingInfos.businessType != filterMap[key]) {
                                 matchFilter = false
                                 return@forEach
                             }
                         FilterType.PORTAL ->
-                            if (state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
+                            if (!filterMap[key].isNullOrEmpty() && state.portal.toString() != filterMap[key] && state.portal != PortalType.ALL) {
                                 matchFilter = false
                                 return@forEach
                             }
-                        FilterType.PRICE ->
-                            if (state.pricingInfos.price > filterMap[key]?.toInt()?: 0) {
+                        FilterType.PRICE -> {
+                            val realStateBusinessType = state.pricingInfos.businessType
+                            val realStatePrice =
+                                if (realStateBusinessType == BusinessType.SALE.toString()) state.pricingInfos.price?: 0
+                                else state.pricingInfos.rentalTotalPrice ?: 0
+                            if (!filterMap[key].isNullOrEmpty() && realStatePrice > getPrice(filterMap[key]?.toInt()?: 0, state.pricingInfos.businessType)) {
                                 matchFilter = false
                                 return@forEach
                             }
+                        }
                         FilterType.BEDROOMS -> {
-                            val bedroom = filterMap[key]?.toInt()?:0
+                            val bedroom = filterMap[key]?.toInt()?:10
                             if ((bedroom < 4 && state.bedrooms != bedroom) || state.bedrooms < bedroom) {
                                 matchFilter = false
                                 return@forEach
@@ -184,14 +183,14 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             RealState.parkingSpaces,
             RealState.images,
             RealState.bedrooms,
-            RealState.portal,
-            RealState.address.city,
-            RealState.address.neighborhood,
-            RealState.pricingInfos.yearlyIptu,
-            RealState.pricingInfos.price,
-            RealState.pricingInfos.rentalTotalPrice,
+            RealState.portal ?: PortalType.ALL,
+            RealState.address.city ?: "",
+            RealState.address.neighborhood ?: "",
+            RealState.pricingInfos.yearlyIptu ?: 0,
+            RealState.pricingInfos.price ?: 0,
+            RealState.pricingInfos.rentalTotalPrice ?: 0,
             RealState.pricingInfos.businessType,
-            RealState.pricingInfos.monthlyCondoFee
+            RealState.pricingInfos.monthlyCondoFee ?: 0
         )
     }
 }

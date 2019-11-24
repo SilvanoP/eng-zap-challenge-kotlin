@@ -17,5 +17,5 @@ data class RealState(
     val bedrooms : Int,
     val pricingInfos : PricingInfos,
     @Transient
-    var portal: PortalType = PortalType.ALL
+    var portal: PortalType?
 )
