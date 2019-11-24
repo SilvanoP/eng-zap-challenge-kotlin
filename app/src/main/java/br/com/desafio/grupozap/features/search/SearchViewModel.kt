@@ -1,12 +1,13 @@
 package br.com.desafio.grupozap.features.search
 
-import android.app.Application
 import androidx.lifecycle.*
 import br.com.desafio.grupozap.domain.FiltersUseCase
 import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.FilterType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObserver {
@@ -27,15 +28,16 @@ class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObser
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun load() {
         loadingData.postValue(true)
-        GlobalScope.launch {
-            val result = useCase.refreshCachedLegalStates()
-
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                useCase.refreshCachedLegalStates()
+            }
             val filter = useCase.getFilters()
             if (filter.isNotEmpty()) {
                 filterMap.postValue(filter)
             }
+            loadingData.postValue(result)
         }
-        loadingData.postValue(false)
     }
 
     fun getPriceByRate(rate: Int, businessType: String) {

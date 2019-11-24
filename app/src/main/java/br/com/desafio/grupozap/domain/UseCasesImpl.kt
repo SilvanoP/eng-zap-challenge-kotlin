@@ -1,5 +1,6 @@
 package br.com.desafio.grupozap.domain
 
+import android.util.Log
 import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.FilterType
 import br.com.desafio.grupozap.utils.PortalType
@@ -21,7 +22,9 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     private var lastLegalStatesIndex = 0
 
     override suspend fun refreshCachedLegalStates(): Boolean {
-        repository.getAllRealStates().forEach {
+        val result = repository.getAllRealStates()
+        Log.d("USE CASE", "Result: " + result.size)
+        result.forEach {
             // verify if each real state is eligible for Zap or Viva Real or none
             val lat = it.address.geoLocation.location.lat
             val lon = it.address.geoLocation.location.lon
@@ -69,6 +72,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             }
         }
 
+        Log.d("USE CASE", "Cached: " + cachedLegalStates.size)
         if(cachedLegalStates.size > 0)
             return true
 
