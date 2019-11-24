@@ -17,7 +17,6 @@ import kotlin.collections.ArrayList
 class UseCasesImpl @Inject constructor(private val repository: DataRepository): RealStateUseCases, FiltersUseCase {
 
     private val cachedLegalStates: MutableList<RealState> = ArrayList()
-    private val cachedFilteredStates: MutableList<RealStateView> = ArrayList()
     private var filterMap: MutableMap<FilterType, String> = Collections.synchronizedMap(EnumMap<FilterType, String>(FilterType::class.java))
     private var lastLegalStatesIndex = 0
 
@@ -119,9 +118,11 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             endIndex = cachedLegalStates.size
         }
 
+        val cachedFilteredStates: MutableList<RealStateView> = ArrayList()
+
         if (filterMap.isEmpty()) {
             cachedFilteredStates.addAll(cachedLegalStates.subList(startIndex, endIndex).map(realStateViewMapper))
-        } else if(cachedFilteredStates.size < endIndex) {
+        } else if(cachedFilteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
             val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
             auxList.forEachIndexed { index, state ->
                 var matchFilter = true

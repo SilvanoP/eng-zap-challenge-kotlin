@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import br.com.desafio.grupozap.R
+import br.com.desafio.grupozap.databinding.FragmentListBinding
 import br.com.desafio.grupozap.features.common.NavigationListener
 import br.com.desafio.grupozap.features.common.RealStateView
 import kotlinx.android.synthetic.main.fragment_list.view.*
@@ -46,16 +46,25 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_list, container, false)
-        viewModel.stateLiveData.observe(this, stateObserver)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val binding = FragmentListBinding.inflate(inflater, container, false)
+        subscribeUI(binding)
+        val view = binding.root
 
         initRecycler(view)
 
+        savedInstanceState?.let {
+            viewModel.restoreList()
+        } ?: viewModel.updateList()
+
         return view
+    }
+    private fun subscribeUI(binding: FragmentListBinding) {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        this.lifecycle.addObserver(viewModel)
+        viewModel.stateLiveData.observe(this, stateObserver)
     }
 
     private fun initRecycler(view: View) {
@@ -72,7 +81,7 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
     }
 
     override fun onItemSelected(realState: RealStateView) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onAttach(context: Context) {
@@ -102,7 +111,8 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
             }
     }
 
-    inner class OnScrollListener(val layoutManager: LinearLayoutManager): RecyclerView.OnScrollListener() {
+    inner class OnScrollListener(private val layoutManager: LinearLayoutManager):
+        RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (isLastItemVisible() && !isLoading && !isLastPage) {

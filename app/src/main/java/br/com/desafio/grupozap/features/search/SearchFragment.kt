@@ -12,6 +12,7 @@ import br.com.desafio.grupozap.features.common.NavigationListener
 import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.PortalType
 import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.fragment_search.view.*
 
 class SearchFragment : Fragment() {
 
@@ -20,13 +21,13 @@ class SearchFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
-
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         subscribeUI(binding)
+        val view = binding.root
 
-        loadListeners()
+        loadListeners(view)
 
-        return binding.root
+        return view
     }
 
     private fun subscribeUI(binding: FragmentSearchBinding) {
@@ -40,8 +41,8 @@ class SearchFragment : Fragment() {
         })
     }
 
-    private fun loadListeners() {
-        searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+    private fun loadListeners(view: View) {
+        view.searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 var businessType = ""
                 if (searchBuyToggleButton.isChecked) {
@@ -57,7 +58,7 @@ class SearchFragment : Fragment() {
             override fun onStopTrackingTouch(p0: SeekBar?) {}
         })
 
-        searchFilterButton.setOnClickListener {
+        view.searchFilterButton.setOnClickListener {
             saveFilter()
         }
     }

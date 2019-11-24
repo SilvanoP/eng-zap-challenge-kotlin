@@ -59,7 +59,7 @@
             android:textOn="@string/buy"
             android:textOff="@string/buy"
             android:textAllCaps="true"
-            android:checked="@{viewModel.filterMap[FilterType.TYPE] == SALE ? true : false}"
+            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "SALE" ? true : false}'
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintTop_toBottomOf="@id/searchCityNeighborhoodInputLayout"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,7 @@
             android:textOn="@string/rent"
             android:textOff="@string/rent"
             android:textAllCaps="true"
-            android:checked="@{viewModel.filterMap[FilterType.TYPE] == SALE ? false : true}"
+            android:checked='@{viewModel.filterMap[FilterType.TYPE] == "SALE" ? false : true}'
             app:layout_constraintTop_toTopOf="@id/searchBuyToggleButton"
             app:layout_constraintStart_toEndOf="@id/searchBuyToggleButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -95,7 +95,7 @@
             app:layout_constraintStart_toStartOf="@+id/searchPortalDividerView"
             app:layout_constraintTop_toBottomOf="@+id/searchBuyToggleButton" />
 
-        <view
+        <View
             android:id="@+id/searchPortalDividerView"
             android:layout_width="0dp"
             android:layout_height="@dimen/divider"
@@ -163,7 +163,7 @@
             android:layout_marginEnd="@dimen/margin_default"
             android:layout_marginBottom="@dimen/margin_default"
             android:max="@integer/max_price_interval"
-            android:progress="@{filterMap[FilterType.PRICE] == null ? 0 : filterMap[FilterType.PRICE]}"
+            android:progress='@{viewModel.filterMap[FilterType.PRICE] == null ? 0 : Integer.parseInt(viewModel.filterMap[FilterType.PRICE])}'
             app:layout_constraintBottom_toTopOf="@+id/searchFilterButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

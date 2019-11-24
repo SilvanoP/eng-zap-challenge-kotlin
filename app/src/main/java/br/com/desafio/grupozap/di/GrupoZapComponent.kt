@@ -12,6 +12,7 @@ import javax.inject.Singleton
     ContextModule::class,
     DataModule::class,
     DomainModule::class,
+    ActivityModule::class,
     AndroidSupportInjectionModule::class
 ])
 interface GrupoZapComponent: AndroidInjector<GrupoZapApplication> {

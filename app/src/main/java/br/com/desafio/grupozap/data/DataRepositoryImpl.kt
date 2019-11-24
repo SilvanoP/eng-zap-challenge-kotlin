@@ -26,7 +26,7 @@ class DataRepositoryImpl @Inject constructor(private val context: Context, priva
     override suspend fun getAllRealStates(): List<RealState> {
         interceptor.isOnline = isOnline()
 
-        return service.getRealStates().realStates
+        return service.getRealStates()
     }
 
     override suspend fun getFilter(filter: String): String? {

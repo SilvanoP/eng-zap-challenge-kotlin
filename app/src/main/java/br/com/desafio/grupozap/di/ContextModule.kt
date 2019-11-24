@@ -2,15 +2,15 @@ package br.com.desafio.grupozap.di
 
 import android.app.Application
 import android.content.Context
+import br.com.desafio.grupozap.GrupoZapApplication
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
+import javax.inject.Singleton
 
 @Module
-object ContextModule {
+abstract class ContextModule {
 
-    @Provides
-    @JvmStatic
-    fun providesContext(application: Application): Context {
-        return application.applicationContext
-    }
+    @Singleton
+    @Binds
+    abstract fun providesContext(application: GrupoZapApplication): Context
 }

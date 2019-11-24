@@ -9,18 +9,20 @@ import br.com.desafio.grupozap.features.list.ListViewModel
 import br.com.desafio.grupozap.features.search.SearchViewModel
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ViewModelFactory @Inject constructor(private val filterUseCase: FiltersUseCase,
-                                           private val realStateUseCases: RealStateUseCases,
-                                           private val application: Application): ViewModelProvider.Factory {
+                                           private val realStateUseCases: RealStateUseCases)
+    : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         with(modelClass) {
             when {
                 isAssignableFrom(SearchViewModel::class.java) ->
-                    SearchViewModel(filterUseCase, application)
+                    SearchViewModel(filterUseCase)
                 isAssignableFrom(ListViewModel::class.java) ->
-                    ListViewModel(realStateUseCases, application)
+                    ListViewModel(realStateUseCases)
                 else ->
                     throw IllegalArgumentException("Unknown class: %s".format(this::class.java.simpleName))
             }

@@ -9,7 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class SearchViewModel (val useCase: FiltersUseCase, application: Application): AndroidViewModel(application), LifecycleObserver {
+class SearchViewModel (val useCase: FiltersUseCase): ViewModel(), LifecycleObserver {
 
     var filterMap = MutableLiveData<Map<FilterType, String>>() .apply {
         value = EnumMap(FilterType::class.java)
