@@ -18,7 +18,7 @@
     <string name="yearly_iptu">Yearly IPTU: R$%s</string>
     <string name="zap">Zap</string>
 
-    <string name="tools_city">City X</string>
-    <string name="tools_price_to">Until 10000</string>
+    <string name="tools_city" translatable="false">City X</string>
+    <string name="tools_price_to" translatable="false">Until 10000</string>
 
 </resources>

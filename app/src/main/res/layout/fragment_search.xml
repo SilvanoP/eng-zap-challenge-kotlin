@@ -126,6 +126,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/no_filter"
                 android:checked='@{viewModel.filterView.portal == "ALL" ? true : false}'
+                android:onClick='@{() -> viewModel.filterView.setPortal("ALL")}'
                 />
 
             <androidx.appcompat.widget.AppCompatRadioButton
@@ -134,6 +135,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/zap"
                 android:checked='@{viewModel.filterView.portal == "ZAP" ? true : false}'
+                android:onClick='@{() -> viewModel.filterView.setPortal("ZAP")}'
                 />
 
             <androidx.appcompat.widget.AppCompatRadioButton
@@ -142,6 +144,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/viva_real"
                 android:checked='@{viewModel.filterView.portal == "VIVA_REAL" ? true : false}'
+                android:onClick='@{() -> viewModel.filterView.setPortal("VIVA_REAL")}'
                 />
 
         </RadioGroup>

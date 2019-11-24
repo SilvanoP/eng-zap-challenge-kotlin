@@ -25,7 +25,7 @@ class SearchViewModel (private val useCase: FiltersUseCase): ViewModel(), Lifecy
     fun load() {
         loadingData.postValue(true)
         if (filterView.value != null) {
-
+            reset()
         }
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -63,24 +63,16 @@ class SearchViewModel (private val useCase: FiltersUseCase): ViewModel(), Lifecy
         }
     }
 
-    fun filterByPortal(portal: String) {
+    fun getPriceByRate(rate: Int, businessType: String) {
         if (filterView.value != null) {
+            val price = useCase.getPrice(rate, businessType)
             val newFilter = filterView.value!!
             newFilter.apply {
-                this.portal = portal
+                priceLabel = Utils.fromDoubleToStringTwoDecimal(price.toDouble())
+                priceRate = rate
             }
             filterView.postValue(newFilter)
         }
-    }
-
-    fun getPriceByRate(rate: Int, businessType: String) {
-        val price = useCase.getPrice(rate, businessType)
-        val newFilter = filterView.value!!
-        newFilter.apply {
-            priceLabel = Utils.fromDoubleToStringTwoDecimal(price.toDouble())
-            priceRate = rate
-        }
-        filterView.postValue(newFilter)
     }
 
     fun saveFilter(location:String?, buy: Boolean, rental: Boolean, portal: String?, price: Int) {
@@ -92,10 +84,5 @@ class SearchViewModel (private val useCase: FiltersUseCase): ViewModel(), Lifecy
             finishedSearch.postValue(true)
         }
         loadingData.postValue(false)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        reset()
     }
 }

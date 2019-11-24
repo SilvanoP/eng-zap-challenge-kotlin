@@ -66,6 +66,13 @@ class MainActivity : AppCompatActivity(), NavigationListener {
         refreshFragment()
     }
 
+    override fun onBackPressed() {
+        if (fragManager.fragments.size > 1) {
+            fragManager.popBackStack()
+        } else
+            super.onBackPressed()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         fragManager.putFragment(outState, FRAGMENT_STATE, currentFragment)
 

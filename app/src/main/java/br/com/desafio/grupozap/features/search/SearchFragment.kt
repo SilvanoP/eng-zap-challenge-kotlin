@@ -59,15 +59,10 @@ class SearchFragment : Fragment() {
             viewModel.filterForRent(isChecked)
         }
 
-        view.searchPortalRadioGroup.setOnCheckedChangeListener { _, radioButtonId ->
-            when(radioButtonId) {
-                view.searchNoFilterRadioButton.id ->
-                    viewModel.filterByPortal(PortalType.ALL.toString())
-                view.searchZapRadioButton.id ->
-                    viewModel.filterByPortal(PortalType.ZAP.toString())
-                view.searchVivaRealRadioButton.id ->
-                    viewModel.filterByPortal(PortalType.VIVA_REAL.toString())
-            }
+        val checked = view.searchPortalRadioGroup.checkedRadioButtonId
+        if (checked > -1) {
+            view.searchPortalRadioGroup.clearCheck()
+            view.searchPortalRadioGroup.check(checked)
         }
 
         view.searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {

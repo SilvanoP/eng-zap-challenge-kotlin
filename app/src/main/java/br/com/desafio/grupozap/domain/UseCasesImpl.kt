@@ -117,7 +117,12 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     }
 
     suspend fun saveFilter(filter: FilterType, value: String) {
+        filterMap.clear()
+        repository.clearFilter()
+        cachedFilteredStates.clear()
+
         if (value.isNotEmpty() && value != "0") {
+            Log.d("USE CASE SAVE FILTER", "Saving filter %s with value %s".format(filter.toString(), value))
             filterMap[filter] = value
             repository.saveFilter(filter.toString(), value)
         }
@@ -158,8 +163,9 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                 filterMap.keys.forEach { key ->
                     when(key) {
                         FilterType.LOCATION ->
-                            if (state.address.city != filterMap[key]
-                                && state.address.neighborhood != filterMap[key]) {
+                            if ((state.address.city.isNullOrEmpty() && state.address.neighborhood.isNullOrEmpty())
+                                || (state.address.city!!.toLowerCase(Locale.getDefault()) != filterMap[key]!!.toLowerCase(Locale.getDefault())
+                                && state.address.neighborhood!!.toLowerCase(Locale.getDefault()) != filterMap[key]!!.toLowerCase(Locale.getDefault()))) {
                                 matchFilter = false
                                 return@forEach
                             }
@@ -178,7 +184,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                             val realStatePrice =
                                 if (realStateBusinessType == BusinessType.SALE.toString()) state.pricingInfos.price?: 0
                                 else state.pricingInfos.rentalTotalPrice ?: 0
-                            if (realStatePrice > getPrice(filterMap[key]?.toInt()?: 0, state.pricingInfos.businessType)) {
+                            if (realStatePrice > filterMap[key]?.toInt()?: 0) {
                                 matchFilter = false
                                 return@forEach
                             }

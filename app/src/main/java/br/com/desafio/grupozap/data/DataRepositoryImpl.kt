@@ -36,4 +36,8 @@ class DataRepositoryImpl @Inject constructor(private val context: Context, priva
     override suspend fun saveFilter(filter: String, value: String): Boolean {
         return preferences.edit().putString(filter, value).commit()
     }
+
+    override suspend fun clearFilter() {
+        preferences.edit().clear().apply()
+    }
 }
