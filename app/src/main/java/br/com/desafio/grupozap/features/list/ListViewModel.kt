@@ -1,5 +1,6 @@
 package br.com.desafio.grupozap.features.list
 
+import android.util.Log
 import androidx.lifecycle.*
 import br.com.desafio.grupozap.domain.ListRealStatesUseCases
 import br.com.desafio.grupozap.features.common.RealStateView
@@ -20,6 +21,7 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
         value = false
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun updateList() {
         val page = getCurrentPage()
         stateLiveData.value = if (page == 0)
@@ -27,6 +29,7 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
         else
             PaginatingState(page, false, getCurrentRealStates())
 
+        Log.d("VIEW MODEL", "PAGE %d".format(page))
         getRealStatesList(page)
     }
 
@@ -48,6 +51,7 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
 
     private fun getRealStatesList(page: Int) {
         loadingData.postValue(true)
+        Log.d("VIEW MODEL", "LOADING DATA")
         viewModelScope.launch {
             val realStatesList = withContext(Dispatchers.IO) {
                 useCase.getNextPage(page)
@@ -64,6 +68,7 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
 
         currentList.addAll(realStatesList)
         loadingData.postValue(false)
+        Log.d("VIEW MODEL", "DEFAULT END? %s".format(areAllItemsLoaded))
         stateLiveData.value = DefaultState(currentPage, areAllItemsLoaded, currentList)
     }
 

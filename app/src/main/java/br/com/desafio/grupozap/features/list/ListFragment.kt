@@ -55,7 +55,7 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
 
         savedInstanceState?.let {
             viewModel.restoreList()
-        } ?: viewModel.updateList()
+        }
 
         return view
     }
@@ -127,8 +127,8 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
         }
 
         private fun isLastItemVisible(): Boolean {
-            val last = layoutManager.findLastVisibleItemPosition()
-            return last == (realStatesList.size-1)
+            val last = layoutManager.findLastCompletelyVisibleItemPosition()
+            return last >= (realStatesList.size-1)
         }
     }
 }

@@ -120,9 +120,8 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         }
     }
 
-    suspend fun saveFilter(filter: FilterType, value: String) {
+    private suspend fun saveFilter(filter: FilterType, value: String) {
         if (value.isNotEmpty() && value != "0") {
-            Log.d("USE CASE SAVE FILTER", "Saving filter %s with value %s".format(filter.toString(), value))
             filterMap[filter] = value
             repository.saveFilter(filter.toString(), value)
         }
@@ -152,32 +151,34 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         if (endIndex > cachedLegalStates.size) {
             endIndex = cachedLegalStates.size
         }
+        Log.d("USE CASE", "START PAGE %d AND END INDEX %d".format(startIndex, endIndex))
+        var filteredStates: MutableList<RealStateView> = ArrayList()
 
-        val filteredStates: MutableList<RealStateView> = ArrayList()
-
-        if(filteredStates.size < endIndex && lastLegalStatesIndex < cachedLegalStates.size-1) {
+        if (cachedFilteredStates.size >= endIndex) {
+            filteredStates = cachedFilteredStates.map {
+                realStateViewMapper(it)
+            }.toMutableList()
+        } else if(lastLegalStatesIndex < cachedLegalStates.size-1) {
             val auxList = cachedLegalStates.subList(lastLegalStatesIndex, cachedLegalStates.size)
-            auxList.forEachIndexed { index, state ->
+            var auxListIndex = 0
+            for (state in auxList) {
                 var matchFilter = true
 
-                filterMap.keys.forEach { key ->
+                for (key in filterMap.keys) {
                     when(key) {
                         FilterType.LOCATION ->
                             if ((state.address.city.isNullOrEmpty() && state.address.neighborhood.isNullOrEmpty())
                                 || (state.address.city!!.toLowerCase(Locale.getDefault()) != filterMap[key]!!.toLowerCase(Locale.getDefault())
-                                && state.address.neighborhood!!.toLowerCase(Locale.getDefault()) != filterMap[key]!!.toLowerCase(Locale.getDefault()))) {
+                                        && state.address.neighborhood!!.toLowerCase(Locale.getDefault()) != filterMap[key]!!.toLowerCase(Locale.getDefault()))) {
                                 matchFilter = false
-                                return@forEach
                             }
                         FilterType.TYPE ->
                             if (state.pricingInfos.businessType != filterMap[key]) {
                                 matchFilter = false
-                                return@forEach
                             }
                         FilterType.PORTAL ->
                             if (state.portal.toString() != filterMap[key] && filterMap[key] != PortalType.ALL.toString()) {
                                 matchFilter = false
-                                return@forEach
                             }
                         FilterType.PRICE -> {
                             val realStateBusinessType = state.pricingInfos.businessType
@@ -186,23 +187,26 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
                                 else state.pricingInfos.rentalTotalPrice ?: 0
                             if (realStatePrice > filterMap[key]?.toInt()?: 0) {
                                 matchFilter = false
-                                return@forEach
                             }
                         }
                     }
+                    if(!matchFilter)
+                        break
                 }
 
                 if (matchFilter) {
                     cachedFilteredStates.add(state)
                     filteredStates.add(realStateViewMapper(state))
-                    if (filteredStates.size > endIndex) {
-                        lastLegalStatesIndex += index
-                        return@forEachIndexed
-                    }
                 }
+                if (filteredStates.size >= PAGE_SIZE) {
+                    lastLegalStatesIndex += auxListIndex
+                    break
+                }
+                auxListIndex++
             }
         }
 
+        Log.d("USE CASE", "ADDING: %d".format(filteredStates.size))
         return filteredStates
     }
 
@@ -216,6 +220,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     }
 
     override fun getSelectedRealState(): RealStateView {
+        lastLegalStatesIndex = 0
         return realStateViewMapper(selectedRealState)
     }
 

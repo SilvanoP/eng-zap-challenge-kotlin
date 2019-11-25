@@ -1,6 +1,8 @@
 package br.com.desafio.grupozap.features.common
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     }
 
     private fun refreshFragment() {
+        invalidateOptionsMenu()
         val fragmentTag = mainFragment!!::class.java.simpleName
 
         fragManager.beginTransaction()
@@ -105,6 +108,42 @@ class MainActivity : AppCompatActivity(), NavigationListener {
         mainFragment = DetailFragment.newInstance(detailViewModel)
 
         refreshFragment()
+    }
+
+    private fun onBackMenuPressed(){
+        when(mainFragment?.tag) {
+            DetailFragment::class.java.simpleName ->
+                if (isTablet) {
+                    initMainFragment()
+                    refreshFragment()
+                } else
+                    onSearchEnded()
+            ListFragment::class.java.simpleName -> {
+                initMainFragment()
+                refreshFragment()
+            }
+        }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val item = menu?.findItem(R.id.menu_back)
+        item?.isVisible = (mainFragment !is SearchFragment)
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            R.id.menu_back ->
+                onBackMenuPressed()
+        }
+        return true
     }
 
     override fun onBackPressed() {

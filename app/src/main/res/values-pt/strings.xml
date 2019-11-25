@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Grupo Zap</string>
 
+    <string name="back">Voltar</string>
     <string name="bedrooms">Quartos: %d</string>
     <string name="buy">Comprar</string>
     <string name="city_neighborhood">Digite a cidade ou bairro</string>

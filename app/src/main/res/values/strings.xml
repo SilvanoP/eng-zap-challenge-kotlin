@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Grupo Zap</string>
 
+    <string name="back">Back</string>
     <string name="bedrooms">Bedrooms: %d</string>
     <string name="buy">Buy</string>
     <string name="city_neighborhood">Type City or Neighborhood</string>
