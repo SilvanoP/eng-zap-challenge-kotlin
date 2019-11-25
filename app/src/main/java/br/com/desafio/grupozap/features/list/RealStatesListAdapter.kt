@@ -48,13 +48,12 @@ class RealStatesListAdapter(private val realStatesList: MutableList<RealStateVie
 
             var price = realState.price
             var descPrice = itemView.context.resources.getString(R.string.price_desc_sale)
-                .format(Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()), realState.yearlyIptu)
+                .format(Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()))
             if (realState.businessType == BusinessType.RENTAL.toString()) {
                 price = realState.rentalTotalPrice
                 descPrice = itemView.context.resources.getString(R.string.price_desc_rental)
                     .format(Utils.fromDoubleToStringTwoDecimal(realState.price.toDouble()),
-                        Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()),
-                        Utils.fromDoubleToStringTwoDecimal(realState.yearlyIptu.toDouble()))
+                        Utils.fromDoubleToStringTwoDecimal(realState.monthlyCondoFee.toDouble()))
             }
             val priceFull = itemView.context.resources.getString(R.string.price_full).format(Utils.fromDoubleToStringTwoDecimal(price.toDouble()))
             itemView.itemFullPriceText.text = priceFull

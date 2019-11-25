@@ -6,4 +6,5 @@
     <dimen name="card_title_text_size">16sp</dimen>
     <dimen name="divider">1dp</dimen>
     <dimen name="margin_default">16dp</dimen>
+    <dimen name="margin_detail_text">8dp</dimen>
 </resources>

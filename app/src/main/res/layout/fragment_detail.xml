@@ -22,7 +22,7 @@
                 android:id="@+id/detailImageViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintHeight_percent="0.7"
+                app:layout_constraintHeight_percent="0.5"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,18 @@
                 android:id="@+id/detailAddressText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_default"
                 app:layout_constraintTop_toBottomOf="@+id/detailImageViewPager"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/detailAddressDivider"
+                />
+
+            <View
+                android:id="@+id/detailAddressDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider"
+                android:background="@color/colorAccent"
+                app:layout_constraintTop_toBottomOf="@+id/detailAddressText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/detailPriceText"
@@ -44,9 +55,12 @@
                 android:id="@+id/detailPriceText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/detailAddressText"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
+                android:textSize="@dimen/card_title_text_size"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/detailAddressDivider"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/detailCondoFeeText"
                 />
 
@@ -54,9 +68,10 @@
                 android:id="@+id/detailCondoFeeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
                 app:layout_constraintTop_toBottomOf="@+id/detailPriceText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/detailYearlyIPTUText"
                 />
 
@@ -64,9 +79,11 @@
                 android:id="@+id/detailYearlyIPTUText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
+                android:layout_marginBottom="@dimen/margin_default"
                 app:layout_constraintTop_toBottomOf="@+id/detailCondoFeeText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/detailDivider"
                 />
 
@@ -74,6 +91,7 @@
                 android:id="@+id/detailDivider"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider"
+                android:background="@color/colorAccent"
                 app:layout_constraintTop_toBottomOf="@+id/detailYearlyIPTUText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -81,12 +99,52 @@
                 />
 
             <TextView
-                android:id="@+id/detailBedroomText"
+                android:id="@+id/detailOtherDetailsText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
+                android:text="@string/other_details"
+                android:textSize="@dimen/card_title_text_size"
+                android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@+id/detailDivider"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/detailAreaText"
+                />
+
+            <TextView
+                android:id="@+id/detailAreaText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintTop_toBottomOf="@+id/detailOtherDetailsText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/detailBedroomText"
+                app:layout_constraintBottom_toTopOf="@+id/detailParkingSpacesText"
+                />
+
+            <TextView
+                android:id="@+id/detailBedroomText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                app:layout_constraintTop_toTopOf="@+id/detailAreaText"
+                app:layout_constraintStart_toEndOf="@+id/detailAreaText"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/detailAreaText"
+                />
+
+            <TextView
+                android:id="@+id/detailParkingSpacesText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_default"
+                android:layout_marginTop="@dimen/margin_detail_text"
+                android:layout_marginBottom="@dimen/margin_default"
+                app:layout_constraintTop_toBottomOf="@+id/detailAreaText"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 />
 

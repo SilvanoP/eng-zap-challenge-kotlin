@@ -14,7 +14,6 @@ import br.com.desafio.grupozap.features.common.NavigationListener
 import br.com.desafio.grupozap.features.common.RealStateView
 import kotlinx.android.synthetic.main.fragment_list.view.*
 
-
 class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
 
     private lateinit var viewModel: ListViewModel
@@ -60,6 +59,7 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
 
         return view
     }
+
     private fun subscribeUI(binding: FragmentListBinding) {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this

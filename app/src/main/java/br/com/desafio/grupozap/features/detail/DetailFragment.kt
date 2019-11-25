@@ -56,12 +56,14 @@ class DetailFragment : Fragment() {
                 val fullPrice =
                     if (it.businessType == BusinessType.SALE.toString()) it.price else it.rentalTotalPrice
 
-                detailPriceText.text = Utils.fromDoubleToStringTwoDecimal(fullPrice.toDouble())
+                detailPriceText.text = getString(R.string.price_full).format(Utils.fromDoubleToStringTwoDecimal(fullPrice.toDouble()))
                 detailBedroomText.text = getString(R.string.bedrooms).format(it.bedrooms)
+                detailAreaText.text = getString(R.string.usable_area).format(it.usableAreas)
                 detailCondoFeeText.text = getString(R.string.monthly_condo_fee)
                     .format(Utils.fromDoubleToStringTwoDecimal(it.monthlyCondoFee.toDouble()))
                 detailYearlyIPTUText.text = getString(R.string.yearly_iptu)
                     .format(Utils.fromDoubleToStringTwoDecimal(it.yearlyIptu.toDouble()))
+                detailParkingSpacesText.text = getString(R.string.parking_spaces).format(it.parkingSpaces)
             }
         })
     }
