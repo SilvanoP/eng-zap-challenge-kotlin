@@ -16,7 +16,8 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-private const val FRAGMENT_STATE = "fragment"
+private const val FRAGMENT_SIDE_STATE = "side_fragment"
+private const val FRAGMENT_MAIN_STATE = "main_fragment"
 
 class MainActivity : AppCompatActivity(), NavigationListener {
 
@@ -24,7 +25,8 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     lateinit var viewModelFactory: ViewModelFactory
 
     private val fragManager: FragmentManager by lazy { supportFragmentManager }
-    private lateinit var currentFragment: Fragment
+    private lateinit var mainFragment: Fragment
+    private var sideFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -34,19 +36,32 @@ class MainActivity : AppCompatActivity(), NavigationListener {
         setSupportActionBar(toolbar)
         supportActionBar?.title = getString(R.string.app_name)
 
-        currentFragment = if (savedInstanceState?.isEmpty == false) {
-            fragManager.getFragment(savedInstanceState, FRAGMENT_STATE)!!
-        } else {
-            val searchViewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
-            SearchFragment.newInstance(searchViewModel)
+        if (isTablet()) {
+            refreshSideFragment()
         }
+
+        val searchViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
+        mainFragment = SearchFragment.newInstance(searchViewModel)
 
         refreshFragment()
     }
 
+    private fun refreshSideFragment() {
+        if (isTablet() && sideFragment == null) {
+            val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
+            sideFragment = ListFragment.newInstance(listViewModel)
+        }
+
+        fragManager.beginTransaction()
+            .replace(R.id.sideFragmentsFrame, sideFragment!!)
+            .disallowAddToBackStack()
+            .commit()
+    }
+
     private fun refreshFragment() {
         fragManager.beginTransaction()
-            .replace(R.id.fragmentsFrame, currentFragment)
+            .replace(R.id.fragmentsFrame, mainFragment)
             .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
             .addToBackStack(null)
             .commit()
@@ -54,17 +69,24 @@ class MainActivity : AppCompatActivity(), NavigationListener {
 
     override fun onSearchEnded() {
         val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
-        currentFragment = ListFragment.newInstance(listViewModel)
 
-        refreshFragment()
+        if(isTablet()) {
+            sideFragment = ListFragment.newInstance(listViewModel)
+            refreshSideFragment()
+        } else {
+            mainFragment = ListFragment.newInstance(listViewModel)
+            refreshFragment()
+        }
     }
 
     override fun onRealStateSelected() {
         val detailViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
-        currentFragment = DetailFragment.newInstance(detailViewModel)
+        mainFragment = DetailFragment.newInstance(detailViewModel)
 
         refreshFragment()
     }
+
+    fun isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
 
     override fun onBackPressed() {
         if (fragManager.backStackEntryCount > 0) {
@@ -74,7 +96,10 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        fragManager.putFragment(outState, FRAGMENT_STATE, currentFragment)
+        fragManager.putFragment(outState, FRAGMENT_MAIN_STATE, mainFragment)
+        if (isTablet()) {
+            fragManager.putFragment(outState, FRAGMENT_SIDE_STATE, sideFragment!!)
+        }
 
         super.onSaveInstanceState(outState)
     }
