@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     }
 
     override fun onBackPressed() {
-        if (fragManager.fragments.size > 1) {
+        if (fragManager.backStackEntryCount > 0) {
             fragManager.popBackStack()
         } else
             super.onBackPressed()

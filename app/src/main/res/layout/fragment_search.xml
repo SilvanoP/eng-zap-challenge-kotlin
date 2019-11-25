@@ -43,7 +43,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/city_neighborhood"
-                android:text="@{viewModel.filterView.location}"
+                android:text="@={viewModel.filterView.location}"
+                android:maxLines="1"
                 tools:text="@string/tools_city"
                 />
 

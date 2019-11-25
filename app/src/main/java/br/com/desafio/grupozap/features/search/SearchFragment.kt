@@ -59,12 +59,6 @@ class SearchFragment : Fragment() {
             viewModel.filterForRent(isChecked)
         }
 
-        val checked = view.searchPortalRadioGroup.checkedRadioButtonId
-        if (checked > -1) {
-            view.searchPortalRadioGroup.clearCheck()
-            view.searchPortalRadioGroup.check(checked)
-        }
-
         view.searchPriceSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 var businessType = ""
