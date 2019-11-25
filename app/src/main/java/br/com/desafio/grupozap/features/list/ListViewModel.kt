@@ -40,6 +40,12 @@ class ListViewModel (val useCase: ListRealStatesUseCases): ViewModel(), Lifecycl
         selectedRealState.postValue(result)
     }
 
+    fun reset() {
+        stateLiveData.postValue(DefaultState(0, false, emptyList()))
+        loadingData.postValue(false)
+        selectedRealState.postValue(false)
+    }
+
     private fun getRealStatesList(page: Int) {
         loadingData.postValue(true)
         viewModelScope.launch {

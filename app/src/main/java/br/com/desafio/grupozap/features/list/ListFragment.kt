@@ -67,6 +67,7 @@ class ListFragment : Fragment(), RealStatesListAdapter.AdapterClickListener {
         viewModel.stateLiveData.observe(this, stateObserver)
         viewModel.selectedRealState.observe(binding.lifecycleOwner!!, Observer {
             if (it) {
+                viewModel.reset()
                 listener?.onRealStateSelected()
             }
         })

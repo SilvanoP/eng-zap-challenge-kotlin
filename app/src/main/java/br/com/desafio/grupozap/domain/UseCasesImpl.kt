@@ -101,6 +101,10 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     }
 
     override suspend fun saveFilters(location:String?, buy: Boolean, rental: Boolean, portal: String?, price: Int) {
+        filterMap.clear()
+        repository.clearFilter()
+        cachedFilteredStates.clear()
+
         if (!location.isNullOrEmpty()) {
             saveFilter(FilterType.LOCATION, location)
         }
@@ -117,10 +121,6 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
     }
 
     suspend fun saveFilter(filter: FilterType, value: String) {
-        filterMap.clear()
-        repository.clearFilter()
-        cachedFilteredStates.clear()
-
         if (value.isNotEmpty() && value != "0") {
             Log.d("USE CASE SAVE FILTER", "Saving filter %s with value %s".format(filter.toString(), value))
             filterMap[filter] = value

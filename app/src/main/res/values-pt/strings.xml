@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Grupo Zap</string>
+
+    <string name="bedrooms">Quartos: %d</string>
+    <string name="buy">Comprar</string>
+    <string name="city_neighborhood">Digite a cidade ou bairro</string>
+    <string name="monthly_condo_fee">Condomínio: R$%s</string>
+    <string name="no_filter">Ambos</string>
+    <string name="portal_radios">Escolha o Portal</string>
+    <string name="price_desc_rental">Aluguel: R$%1$s + Condominio: R$%2$s &#8226; IPTU anual: R$%3$s</string>
+    <string name="price_desc_sale">Condomínio: R$%1$s &#8226; IPTU anual: R$%2$s</string>
+    <string name="price_full">R$ %s</string>
+    <string name="price_to">Até R$%s</string>
+    <string name="real_state_small_details">Área: %1$d m\u00B2 &#8226; Quartos: %2$d</string>
+    <string name="rent">Alugar</string>
+    <string name="search">Buscar</string>
+    <string name="viva_real">Viva Real</string>
+    <string name="yearly_iptu">IPTU anual: R$%s</string>
+    <string name="zap">Zap</string>
+
+    <string name="tools_city" translatable="false">City X</string>
+    <string name="tools_price_to" translatable="false">Until 10000</string>
+</resources>
