@@ -25,8 +25,11 @@ class MainActivity : AppCompatActivity(), NavigationListener {
     lateinit var viewModelFactory: ViewModelFactory
 
     private val fragManager: FragmentManager by lazy { supportFragmentManager }
-    private lateinit var mainFragment: Fragment
+    private var mainFragment: Fragment? = null
     private var sideFragment: Fragment? = null
+    private val isTablet: Boolean by lazy {
+        resources.getBoolean(R.bool.isTablet)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -36,45 +39,63 @@ class MainActivity : AppCompatActivity(), NavigationListener {
         setSupportActionBar(toolbar)
         supportActionBar?.title = getString(R.string.app_name)
 
-        if (isTablet()) {
+        savedInstanceState?.let {
+            mainFragment = fragManager.getFragment(savedInstanceState, FRAGMENT_MAIN_STATE)
+            if (isTablet) {
+                sideFragment = fragManager.getFragment(savedInstanceState, FRAGMENT_SIDE_STATE)
+            }
+        }
+
+        if (isTablet) {
+            if (sideFragment == null) sideFragment = initListFragment()
             refreshSideFragment()
         }
 
-        val searchViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
-        mainFragment = SearchFragment.newInstance(searchViewModel)
-
+        if (mainFragment == null) initMainFragment()
         refreshFragment()
     }
 
+    private fun initMainFragment() {
+        val searchViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
+        mainFragment = SearchFragment.newInstance(searchViewModel)
+    }
+
+    private fun initListFragment(): Fragment {
+        val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
+        return ListFragment.newInstance(listViewModel)
+    }
+
     private fun refreshSideFragment() {
-        if (isTablet() && sideFragment == null) {
-            val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
-            sideFragment = ListFragment.newInstance(listViewModel)
+        if (isTablet && sideFragment == null) {
+            initListFragment()
         }
 
+        val fragmentTag = sideFragment!!::class.java.simpleName
+
         fragManager.beginTransaction()
-            .replace(R.id.sideFragmentsFrame, sideFragment!!)
+            .replace(R.id.sideFragmentsFrame, sideFragment!!, fragmentTag)
             .disallowAddToBackStack()
             .commit()
     }
 
     private fun refreshFragment() {
+        val fragmentTag = mainFragment!!::class.java.simpleName
+
         fragManager.beginTransaction()
-            .replace(R.id.fragmentsFrame, mainFragment)
             .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            .addToBackStack(null)
+            .replace(R.id.fragmentsFrame, mainFragment!!, fragmentTag)
+            .addToBackStack(fragmentTag)
             .commit()
     }
 
     override fun onSearchEnded() {
-        val listViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel::class.java)
-
-        if(isTablet()) {
-            sideFragment = ListFragment.newInstance(listViewModel)
+        val fragment = initListFragment()
+        if(isTablet) {
+            sideFragment = fragment
             refreshSideFragment()
         } else {
-            mainFragment = ListFragment.newInstance(listViewModel)
+            mainFragment = fragment
             refreshFragment()
         }
     }
@@ -86,18 +107,16 @@ class MainActivity : AppCompatActivity(), NavigationListener {
         refreshFragment()
     }
 
-    fun isTablet(): Boolean = resources.getBoolean(R.bool.isTablet)
-
     override fun onBackPressed() {
-        if (fragManager.backStackEntryCount > 0) {
+        if (fragManager.backStackEntryCount > 1) {
             fragManager.popBackStack()
         } else
             super.onBackPressed()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        fragManager.putFragment(outState, FRAGMENT_MAIN_STATE, mainFragment)
-        if (isTablet()) {
+        fragManager.putFragment(outState, FRAGMENT_MAIN_STATE, mainFragment!!)
+        if (isTablet) {
             fragManager.putFragment(outState, FRAGMENT_SIDE_STATE, sideFragment!!)
         }
 

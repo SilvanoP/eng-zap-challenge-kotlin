@@ -29,6 +29,12 @@
             android:layout_weight="1"
             />
 
+        <View
+            android:layout_width="@dimen/divider"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"
+            />
+
         <FrameLayout
             android:id="@+id/fragmentsFrame"
             android:layout_width="0dp"
