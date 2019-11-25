@@ -1,6 +1,5 @@
 package br.com.desafio.grupozap.domain
 
-import android.util.Log
 import br.com.desafio.grupozap.data.entities.RealState
 import br.com.desafio.grupozap.features.common.FilterView
 import br.com.desafio.grupozap.features.common.RealStateView
@@ -151,7 +150,7 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
         if (endIndex > cachedLegalStates.size) {
             endIndex = cachedLegalStates.size
         }
-        Log.d("USE CASE", "START PAGE %d AND END INDEX %d".format(startIndex, endIndex))
+
         var filteredStates: MutableList<RealStateView> = ArrayList()
 
         if (cachedFilteredStates.size >= endIndex) {
@@ -206,7 +205,6 @@ class UseCasesImpl @Inject constructor(private val repository: DataRepository): 
             }
         }
 
-        Log.d("USE CASE", "ADDING: %d".format(filteredStates.size))
         return filteredStates
     }
 

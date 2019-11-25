@@ -1,6 +1,5 @@
 package br.com.desafio.grupozap.features.search
 
-import android.util.Log
 import androidx.lifecycle.*
 import br.com.desafio.grupozap.domain.FiltersUseCase
 import br.com.desafio.grupozap.features.common.FilterView

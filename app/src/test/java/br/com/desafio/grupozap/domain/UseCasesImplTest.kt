@@ -1,7 +1,6 @@
 package br.com.desafio.grupozap.domain
 
 import br.com.desafio.grupozap.data.entities.*
-import br.com.desafio.grupozap.utils.BusinessType
 import br.com.desafio.grupozap.utils.FilterType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,18 +9,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.random.Random
 
 @RunWith(MockitoJUnitRunner::class)
 class UseCasesImplTest {
@@ -45,113 +41,114 @@ class UseCasesImplTest {
     }
 
     @Test
-    fun refreshCachedLegalStatesTest() {
+    fun refreshCachedLegalStatesSuccessTest() {
         runBlocking {
             launch(Dispatchers.Main) {
-                val state = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
+                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(listRealStates())
 
-                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
+                val result = mockUseCasesImpl.refreshCachedLegalStates()
 
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val resultList = mockUseCasesImpl.getNextPage(0)
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 1)
-                //assertTrue("Wrong state id: %s".format(resultList[0].id), resultList[0].id == state.id)
+                Assert.assertTrue("List should not be empty!", result)
             }
         }
     }
 
     @Test
-    fun getByFilterNoFilterTest() {
+    fun refreshCachedLegalStatesFailedTest() {
         runBlocking {
             launch(Dispatchers.Main) {
-                val state1 = createRandomData()
-                val state2 = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state1)
-                data.add(state2)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
+                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(listIlegalRealStates())
 
-                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
+                val result = mockUseCasesImpl.refreshCachedLegalStates()
 
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val resultList = mockUseCasesImpl.getNextPage(0)
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 1)
-                //assertTrue("Wrong state id: %s".format(resultList[0].id), resultList[0].id == state1.id)
+                Assert.assertTrue("List should be empty!", !result)
             }
         }
     }
 
     @Test
-    fun getByFilterWithOneFilterTest() {
+    fun saveFiltersTest() {
         runBlocking {
             launch(Dispatchers.Main) {
-                val state1 = createRandomData()
-                val state2 = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state1)
-                data.add(state2)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
+                val location = "Sao Paulo"
+                val forSale = false
+                val portal = "ZAP"
+                val priceRate = 4
+                val price = "4000"
+                Mockito.`when`(mockRepository.saveFilter(Mockito.anyString(), Mockito.anyString()))
+                    .thenReturn(true)
+                Mockito.`when`(mockRepository.getFilter(FilterType.LOCATION.toString()))
+                    .thenReturn(location)
+                Mockito.`when`(mockRepository.getFilter(FilterType.PORTAL.toString()))
+                    .thenReturn(portal)
+                Mockito.`when`(mockRepository.getFilter(FilterType.PRICE.toString()))
+                    .thenReturn(price)
+                Mockito.`when`(mockRepository.getFilter(FilterType.TYPE.toString()))
+                    .thenReturn("RENTAL")
 
-                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
+                mockUseCasesImpl.saveFilters(location, forSale, !forSale, portal, priceRate)
+                val filterView = mockUseCasesImpl.getFilters()
 
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val filterMap: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
-                filterMap[FilterType.LOCATION] = "City"
-
-                val resultList = mockUseCasesImpl.getNextPage(0)
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == 2)
+                Assert.assertTrue("Location incorrect", filterView.location == location)
+                Assert.assertTrue("Type incorrect", filterView.forSale == forSale)
+                Assert.assertTrue("Portal incorrect %s".format(filterView.portal),
+                    filterView.portal == portal)
+                Assert.assertTrue("Price Rate incorrect %d".format(priceRate),
+                    filterView.priceRate == priceRate)
+                Assert.assertTrue("Price incorrect", filterView.priceLabel == price)
             }
         }
     }
 
     @Test
-    fun getByFilterWithMoreFiltersTest() {
+    fun getNextPageTest() {
         runBlocking {
             launch(Dispatchers.Main) {
-                val state1 = createRandomData()
-                val state2 = createRandomData()
-                val data: MutableList<RealState> = ArrayList()
-                data.add(state1)
-                data.add(state2)
-                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(data.toList())
+                Mockito.`when`(mockRepository.getAllRealStates()).thenReturn(listRealStates())
+                Mockito.`when`(mockRepository.saveFilter(Mockito.anyString(), Mockito.anyString()))
+                    .thenReturn(true)
 
-                val resultOk = mockUseCasesImpl.refreshCachedLegalStates()
+                mockUseCasesImpl.refreshCachedLegalStates()
+                mockUseCasesImpl.saveFilters("City", false, true, "ALL", 6)
+                val result = mockUseCasesImpl.getNextPage(0)
 
-                assertTrue("CachedLegalRealStates Error", resultOk)
-
-                val filterMap: MutableMap<FilterType, String> = EnumMap(FilterType::class.java)
-                filterMap[FilterType.BEDROOMS] = state1.bedrooms.toString()
-
-                val resultList = mockUseCasesImpl.getNextPage(0)
-
-                var resultSize = 1
-                if (state1.bedrooms == state2.bedrooms) {
-                    resultSize = 2
-                }
-
-                assertTrue("Wrong result size: %d".format(resultList.size), resultList.size == resultSize)
-                //assertTrue("Wrong state id: %s".format(resultList[0].id), resultList[0].id == state1.id)
+                Assert.assertTrue("Empty list", result.size == 1)
+                Assert.assertTrue("Correct Result", result[0].usableAreas == 35 && result[0].city == "City")
             }
         }
     }
 
-    private fun createRandomData(): RealState {
-        val loc = Location(Random.nextDouble(0.0, 99.9), Random.nextDouble(0.0, 99.9))
-        val geo = GeoLocation("TEST", loc)
-        val address = Address("City", "neighborhood", geo)
-        val pricingInfos = PricingInfos(Random.nextInt(50,150), Random.nextInt(100000,900000),
-            Random.nextInt(1000,10000), BusinessType.SALE.toString(), "0")
-        return RealState(30, "", "",  "", Random.nextInt().toString(),
-            1, "", false, ArrayList(), address, 1, Random.nextInt(1,6),
-            pricingInfos)
+    private fun listRealStates(): List<RealState> {
+        val images1: MutableList<String> = ArrayList()
+        images1.add("https://resizedimgs.vivareal.com/crop/400x300/vr.images.sp/some-id1.jpg")
+
+        val validLocation = Location(-46.716542, -23.502555)
+        val validGeoLocation = GeoLocation("ROOFTOP", validLocation)
+        val validAddress = Address("City", "nwighboohood", validGeoLocation)
+        val pricingInfos = PricingInfos(0, 5000, 5500, "RENTAL", 500)
+        val legalRealState = RealState(35, "USED", "2016-11-16T04:14:02Z",
+            "ACTIVE", "VALID_1", 1, "2016-11-16T04:14:02Z", false,
+            images1, validAddress, 1, 1, pricingInfos, null)
+
+        val legalList: MutableList<RealState> = ArrayList()
+        legalList.add(legalRealState)
+        return legalList
+    }
+
+    private fun listIlegalRealStates(): List<RealState>{
+        val images1: MutableList<String> = ArrayList()
+        images1.add("https://resizedimgs.vivareal.com/crop/400x300/vr.images.sp/some-id1.jpg")
+
+        val invalidLocation = Location(0.0,0.0)
+        val invalidGeoLocation = GeoLocation("", invalidLocation)
+        val invalidAddress = Address("City", "", invalidGeoLocation)
+        val pricingInfos = PricingInfos(0, 5000, 5500, "RENTAL", 500)
+        val ilegalRealState = RealState(35, "USED", "2016-11-16T04:14:02Z",
+            "ACTIVE", "VALID_1", 1, "2016-11-16T04:14:02Z", false,
+            images1, invalidAddress, 1, 1, pricingInfos, null)
+
+        val ilegalList: MutableList<RealState> = ArrayList()
+        ilegalList.add(ilegalRealState)
+        return ilegalList
     }
 }
